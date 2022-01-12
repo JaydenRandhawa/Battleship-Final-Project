@@ -18,43 +18,57 @@ public class Main implements ActionListener{
     }
 
     public Main(Color borderColour, Color squareColour) {
-        JFrame frame = new JFrame();
-        JFrame frame2 = new JFrame();
-        JPanel panel = new JPanel();
-        JPanel panel2 = new JPanel();
-        JPanel footerPanel = new JPanel();
 
-        JSplitPane view1 = new JSplitPane(SwingConstants.HORIZONTAL, panel, footerPanel);
+        // SECTION User panel, footer, frame initialization.
+        
+        JPanel userPanel = new JPanel();
+        JPanel userFooter = new JPanel();
+        JFrame userFrame = new JFrame();
 
-        view1.setDividerLocation(800);
-        view1.setDividerSize(0);
+        // !SECTION
 
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.setLayout(new GridLayout(height, width));
-        // panel.setBackground(Color.DARK_GRAY);
+        // SECTION User panel, footer, frame setup
 
-        footerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        footerPanel.setLayout(new GridBagLayout());
+        userPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        userPanel.setLayout(new GridLayout(height, width));
+        // userPanel.setBackground(Color.DARK_GRAY);
+
+        userFooter.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        userFooter.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        panel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        panel2.setLayout(new GridLayout(height, width));
+        //ANCHOR Combine game board and footer into 1 pane object
+        JSplitPane userPane = new JSplitPane(SwingConstants.HORIZONTAL, userPanel, userFooter);
 
-        frame.setPreferredSize(new Dimension(width*100, (height+1)*100));
-        frame.setResizable(false);
-        frame.add(view1, BorderLayout.CENTER);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Your Board");
-        frame.pack();
+        userPane.setDividerLocation(800);
+        userPane.setDividerSize(0);
 
-        // frame2.setPreferredSize(new Dimension(800, 800));
-        // frame2.setResizable(false);
-        // frame2.add(panel2, BorderLayout.CENTER);
-        // frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // frame2.setTitle("Opponent Board");
-        // frame2.pack();
-        // frame2.setLocation(800, 0);
+        userFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
+        userFrame.setResizable(false);
+        userFrame.add(userPane, BorderLayout.CENTER);
+        userFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        userFrame.setTitle("Your Board");
+        userFrame.pack();
+
+        // !SECTION
+
+
+
+        JFrame opponentFrame = new JFrame();
+        JPanel opponentPanel = new JPanel();
+        JPanel opponentFooter = new JPanel();
+
+        opponentPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        opponentPanel.setLayout(new GridLayout(height, width));
+
+        opponentFrame.setPreferredSize(new Dimension(800, 800));
+        opponentFrame.setResizable(false);
+        opponentFrame.add(opponentPanel, BorderLayout.CENTER);
+        opponentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        opponentFrame.setTitle("Opponent Board");
+        opponentFrame.pack();
+        opponentFrame.setLocation(800, 0);
 
         for(int i=0;i<height;i++){
             for(int ii=0;ii<width;ii++){
@@ -66,26 +80,30 @@ public class Main implements ActionListener{
                 x.setOpaque(true);
                 x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
                 x.addActionListener(this);
-                panel.add(x);
+                userPanel.add(x);
             }
         }
 
+            for(int i=0;i<height;i++){
+                for(int ii=0;ii<width;ii++){
+                    JButton x =  cpuButtons[ii][i] = new JButton("" + ii + "," + i + "," + 1);
+                    x.setForeground(squareColour);
+                    // x.setBorder(null);
+                    // x.setBorderPainted(false);
+                    x.setBackground(squareColour);
+                    x.setOpaque(true);
+                    x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
+                    x.addActionListener(this);
+                    opponentPanel.add(x);
+                }
+            }
+
             instruction = new JLabel("Select a cell");
-            footerPanel.add(instruction);
+            userFooter
+.add(instruction);
 
-        // for(int i=0;i<height*width;i++){
-        //     JButton x =  buttons2[i] = new JButton("" + i);
-        //     x.setForeground(squareColour);
-        //     // x.setBorder(null);
-        //     // x.setBorderPainted(false);
-        //     x.setBackground(squareColour);
-        //     x.setOpaque(true);
-        //     x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
-        //     panel2.add(x);
-        // }
-
-        frame.setVisible(true);
-        // frame2.setVisible(true);
+        userFrame.setVisible(true);
+        opponentFrame.setVisible(true);
 
 
     }
