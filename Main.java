@@ -22,13 +22,13 @@ public class Main implements ActionListener{
         JPanel panel2 = new JPanel();
 
         panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        panel.setLayout(new GridLayout(width, height));
+        panel.setLayout(new GridLayout(height + 1, width));
         // panel.setBackground(Color.DARK_GRAY);
 
         panel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         panel2.setLayout(new GridLayout(width, height));
 
-        frame.setPreferredSize(new Dimension(800, 800));
+        frame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         frame.setResizable(false);
         frame.add(panel, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,7 +45,7 @@ public class Main implements ActionListener{
 
         for(int i=0;i<height;i++){
             for(int ii=0;ii<width;ii++){
-                JButton x =  userButtons[ii][i] = new JButton("" + ii + "," + i);
+                JButton x =  userButtons[ii][i] = new JButton("" + ii + "," + i + "," + 0);
                 x.setForeground(squareColour);
                 // x.setBorder(null);
                 // x.setBorderPainted(false);
@@ -55,6 +55,11 @@ public class Main implements ActionListener{
                 x.addActionListener(this);
                 panel.add(x);
             }
+        }
+
+        for(int i=0;i<8;i++){
+            JLabel instruction = new JLabel("Test");
+            panel.add(instruction);
         }
 
         // for(int i=0;i<height*width;i++){
@@ -75,7 +80,9 @@ public class Main implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e) {
-        int coords[] = new int[]{Integer.parseInt(e.getActionCommand().split(",")[0]), Integer.parseInt(e.getActionCommand().split(",")[1])};
+        String[] fields = e.getActionCommand().split(",");
+        int boardID = Integer.parseInt(fields[2]);
+        int coords[] = new int[]{Integer.parseInt(fields[0]), Integer.parseInt(fields[1])};
 
         System.out.println("Button Pressed: " + coords[0] + ", " + coords[1]);
 
