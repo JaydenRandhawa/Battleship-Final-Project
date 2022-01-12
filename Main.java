@@ -3,13 +3,13 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Main implements ActionListener{
-    JButton[] buttons = new JButton[64];
-    JButton[] buttons2 = new JButton[64];
-
     public int width = 8;
     public int height = 8;
 
-    public int prevSquare = 0;
+    JButton[][] userButtons = new JButton[width][height];
+    JButton[][] cpuButtons = new JButton[width][height];
+
+    public int[] prevSquare = new int[2];
 
     public static void main(String[] args) {
         new Main(Color.BLACK, Color.WHITE);
@@ -32,55 +32,60 @@ public class Main implements ActionListener{
         frame.setResizable(false);
         frame.add(panel, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Opponent Board");
+        frame.setTitle("Your Board");
         frame.pack();
 
         frame2.setPreferredSize(new Dimension(800, 800));
         frame2.setResizable(false);
         frame2.add(panel2, BorderLayout.CENTER);
         frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame2.setTitle("Your Board");
+        frame2.setTitle("Opponent Board");
         frame2.pack();
         frame2.setLocation(800, 0);
 
-        for(int i=0;i<height*width;i++){
-            JButton x =  buttons[i] = new JButton("" + i);
-            x.setForeground(squareColour);
-            // x.setBorder(null);
-            // x.setBorderPainted(false);
-            x.setBackground(squareColour);
-            x.setOpaque(true);
-            x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
-            x.addActionListener(this);
-            panel.add(x);
+        for(int i=0;i<height;i++){
+            for(int ii=0;ii<width;ii++){
+                JButton x =  userButtons[ii][i] = new JButton("" + ii + "," + i);
+                x.setForeground(squareColour);
+                // x.setBorder(null);
+                // x.setBorderPainted(false);
+                x.setBackground(squareColour);
+                x.setOpaque(true);
+                x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
+                x.addActionListener(this);
+                panel.add(x);
+            }
         }
 
-        for(int i=0;i<height*width;i++){
-            JButton x =  buttons2[i] = new JButton("" + i);
-            x.setForeground(squareColour);
-            // x.setBorder(null);
-            // x.setBorderPainted(false);
-            x.setBackground(squareColour);
-            x.setOpaque(true);
-            x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
-            panel2.add(x);
-        }
+        // for(int i=0;i<height*width;i++){
+        //     JButton x =  buttons2[i] = new JButton("" + i);
+        //     x.setForeground(squareColour);
+        //     // x.setBorder(null);
+        //     // x.setBorderPainted(false);
+        //     x.setBackground(squareColour);
+        //     x.setOpaque(true);
+        //     x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
+        //     panel2.add(x);
+        // }
 
         frame.setVisible(true);
-        frame2.setVisible(true);
+        // frame2.setVisible(true);
 
 
     }
 
     public void actionPerformed(ActionEvent e) {
-        System.out.println("Button Pressed " + e.getActionCommand());
+        int coords[] = new int[]{Integer.parseInt(e.getActionCommand().split(",")[0]), Integer.parseInt(e.getActionCommand().split(",")[1])};
 
-        buttons[prevSquare].setBackground(Color.WHITE);
-        buttons[prevSquare].setForeground(Color.WHITE);
+        System.out.println("Button Pressed: " + coords[0] + ", " + coords[1]);
 
-        buttons[Integer.parseInt(e.getActionCommand())].setBackground(Color.RED);
-        buttons[Integer.parseInt(e.getActionCommand())].setForeground(Color.RED);
+        userButtons[prevSquare[0]][prevSquare[1]].setBackground(Color.WHITE);
+        userButtons[prevSquare[0]][prevSquare[1]].setForeground(Color.WHITE);
+
+        userButtons[coords[0]][coords[1]].setBackground(Color.RED);
+        userButtons[coords[0]][coords[1]].setForeground(Color.RED);
         
-        prevSquare = Integer.parseInt(e.getActionCommand());
+        prevSquare[0] = coords[0];
+        prevSquare[1] = coords[1];
     }
 }
