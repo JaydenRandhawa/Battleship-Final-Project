@@ -4,9 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 
 import java.util.Random;
@@ -33,11 +34,18 @@ public class Main implements ActionListener, KeyListener{
     int[][] submarine = new int[2][3];
     int[][] destroyer = new int[2][2];
 
-    ArrayList<String> unhitEnemySquares = new ArrayList<String>();
+    ArrayList<String> unhitUserShips = new ArrayList<String>();
+    ArrayList<String> unhitEnemyShips = new ArrayList<String>();
 
-    public Main(ImageIcon water) {
-        this.water = water;
-    }
+    ArrayList<String> remainingEnemySquares = new ArrayList<String>(Arrays.asList(
+    "0, 0", "0, 1", "0, 2", "0, 3", "0, 4", "0, 5", "0, 6", "0, 7", 
+    "1, 0", "1, 1", "1, 2", "1, 3", "1, 4", "1, 5", "1, 6", "1, 7", 
+    "2, 0", "2, 1", "2, 2", "2, 3", "2, 4", "2, 5", "2, 6", "2, 7", 
+    "3, 0", "3, 1", "3, 2", "3, 3", "3, 4", "3, 5", "3, 6", "3, 7", 
+    "4, 0", "4, 1", "4, 2", "4, 3", "4, 4", "4, 5", "4, 6", "4, 7", 
+    "5, 0", "5, 1", "5, 2", "5, 3", "5, 4", "5, 5", "5, 6", "5, 7", 
+    "6, 0", "6, 1", "6, 2", "6, 3", "6, 4", "6, 5", "6, 6", "6, 7", 
+    "7, 0", "7, 1", "7, 2", "7, 3", "7, 4", "7, 5", "7, 6", "7, 7"));
 
     String[][] enemyCarrier = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
     String[][] enemyBattleship = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
@@ -52,8 +60,9 @@ public class Main implements ActionListener, KeyListener{
 
     JFrame opponentFrame;
 
-    static Random rand = new Random();
-    static File enemyBoard = new File("OpponentPresets/" + rand.nextInt(6) + ".txt");
+    Random randPos = new Random();
+    static Random randFile = new Random();
+    static File enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
     // static File enemyBoard = new File("OpponentPresets/6.txt");
     static Scanner inp;
 
@@ -169,70 +178,25 @@ public class Main implements ActionListener, KeyListener{
         userFrame.setVisible(true);
     }
 
-    public void printAllShips(){
-
-        for(int i=0;i<2;i++){
-            for(int ii=0;ii<5;ii++){
-                System.out.print(carrier[i][ii] + ", ");
-            }
-            System.out.println();
-        }
-
-        for(int i=0;i<2;i++){
-            for(int ii=0;ii<4;ii++){
-                System.out.print(battleship[i][ii] + ", ");
-            }
-            System.out.println();
-        }
-
-        for(int i=0;i<2;i++){
-            for(int ii=0;ii<3;ii++){
-                System.out.print(submarine[i][ii] + ", ");
-            }
-            System.out.println();
-        }
-
-        for(int i=0;i<2;i++){
-            for(int ii=0;ii<2;ii++){
-                System.out.print(destroyer[i][ii] + ", ");
-            }
-            System.out.println();
-        }
-    }
-
-    public void showEnemyShips(){
+    public void createPlayerLists(){
         for(int i=0;i<5;i++){
-            cpuButtons[Integer.parseInt(enemyCarrier[0][i])][Integer.parseInt(enemyCarrier[1][i])].setIcon(ship);
+            unhitUserShips.add(carrier[0][i] + "," + carrier[1][i]);
+            unhitEnemyShips.add(enemyCarrier[0][i] + "," + enemyCarrier[1][i]);
         }
 
         for(int i=0;i<4;i++){
-            cpuButtons[Integer.parseInt(enemyBattleship[0][i])][Integer.parseInt(enemyBattleship[1][i])].setIcon(ship);
+            unhitUserShips.add(battleship[0][i] + "," + battleship[1][i]);
+            unhitEnemyShips.add(enemyBattleship[0][i] + "," + enemyBattleship[1][i]);
         }
 
         for(int i=0;i<3;i++){
-            cpuButtons[Integer.parseInt(enemySubmarine[0][i])][Integer.parseInt(enemySubmarine[1][i])].setIcon(ship);
+            unhitUserShips.add(submarine[0][i] + "," + submarine[1][i]);
+            unhitEnemyShips.add(enemySubmarine[0][i] + "," + enemySubmarine[1][i]);
         }
 
         for(int i=0;i<2;i++){
-            cpuButtons[Integer.parseInt(enemyDestroyer[0][i])][Integer.parseInt(enemyDestroyer[1][i])].setIcon(ship);
-        }
-    }
-
-    public void createEnemyList(){
-        for(int i=0;i<5;i++){
-            unhitEnemySquares.add(enemyCarrier[0][i] + "," + enemyCarrier[1][i]);
-        }
-
-        for(int i=0;i<4;i++){
-            unhitEnemySquares.add(enemyBattleship[0][i] + "," + enemyBattleship[1][i]);
-        }
-
-        for(int i=0;i<3;i++){
-            unhitEnemySquares.add(enemySubmarine[0][i] + "," + enemySubmarine[1][i]);
-        }
-
-        for(int i=0;i<2;i++){
-            unhitEnemySquares.add(enemyDestroyer[0][i] + "," + enemyDestroyer[1][i]);
+            unhitUserShips.add(destroyer[0][i] + "," + destroyer[1][i]);
+            unhitEnemyShips.add(enemyDestroyer[0][i] + "," + enemyDestroyer[1][i]);
         }
     }
 
@@ -286,10 +250,11 @@ public class Main implements ActionListener, KeyListener{
                         else{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
-                            createEnemyList();
-                            // showEnemyShips();
+                            createPlayerLists();
+                            Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
                             opponentFrame.setVisible(true);
-                            printAllShips();
+
+                            Debug.printAllShips(carrier, battleship, submarine, destroyer);
                         }
                     }
                     else{
@@ -338,10 +303,10 @@ public class Main implements ActionListener, KeyListener{
                         else{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
-                            createEnemyList();
-                            // showEnemyShips();
+                            createPlayerLists();
+                            Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
                             opponentFrame.setVisible(true);
-                            printAllShips();
+                            Debug.printAllShips(carrier, battleship, submarine, destroyer);
                         }
                     }
                     else{
@@ -351,29 +316,30 @@ public class Main implements ActionListener, KeyListener{
             }
         }
         else if(boardID == 1){
-            if(!handleHit(coords)){
+            if(!handleHit(coords, 0)){
                 System.out.println("Miss");
+                String hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
+                int[] hitCoords= new int[2];
+
+                hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
+                hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
+
+                remainingEnemySquares.remove(hitPos);
+
+                while(handleHit(hitCoords, 1)){
+                    hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
+
+                    hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
+                    hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
+
+                    remainingEnemySquares.remove(hitPos);
+                }
+
             }
             else{
                 System.out.println("Hit");
             }
         }
-
-        // System.out.println("Button Pressed: " + coords[0] + ", " + coords[1]);
-        // userInstruction.setText("Cell Selected: " + coords[0] + ", " + coords[1]);
-
-        // // userButtons[prevSquare[0]][prevSquare[1]].setBackground(Color.WHITE);
-        // // userButtons[prevSquare[0]][prevSquare[1]].setForeground(Color.WHITE);
-
-        // userButtons[prevSquare[0]][prevSquare[1]].setIcon(water);
-
-        // // userButtons[coords[0]][coords[1]].setBackground(Color.RED);
-        // // userButtons[coords[0]][coords[1]].setForeground(Color.RED);
-
-        // userButtons[coords[0]][coords[1]].setIcon(ship);
-        
-        // prevSquare[0] = coords[0];
-        // prevSquare[1] = coords[1];
     }
     public void keyTyped(KeyEvent e) {
         if(e.getKeyChar() == 'r' || e.getKeyChar() == 'R'){
@@ -395,25 +361,34 @@ public class Main implements ActionListener, KeyListener{
         
     }
 
-    boolean isHit = false;
-    boolean userWon = false;
-    boolean cpuWon = false;
 
-    public boolean handleHit(int[] coords){
-        cpuButtons[coords[0]][coords[1]].setIcon(hitWater);
-        // System.out.println(unhitSquares);
-        // for(int i=0;i<unhitEnemySquares.size();i++){
-        //     System.out.println(unhitEnemySquares.get(i));
-        //     // System.out.println();
-        // }
+    int userPoints = 0;
+    int cpuPoints = 0;
 
+    public boolean handleHit(int[] coords, int boardID){
         boolean value = false;
-        while(unhitEnemySquares.contains(coords[0] + "," + coords[1])){
-            unhitEnemySquares.remove(unhitEnemySquares.indexOf(coords[0] + "," + coords[1]));
-            cpuButtons[coords[0]][coords[1]].setIcon(hitShip);
-            value = true;
+
+        if(boardID == 0){
+            cpuButtons[coords[0]][coords[1]].setIcon(hitWater);
+            while(unhitEnemyShips.contains(coords[0] + "," + coords[1])){
+                userPoints ++;
+                unhitEnemyShips.remove(unhitEnemyShips.indexOf(coords[0] + "," + coords[1]));
+                cpuButtons[coords[0]][coords[1]].setIcon(hitShip);
+                value = true;
+            }
         }
 
+        if(boardID == 1){
+            userButtons[coords[0]][coords[1]].setIcon(hitWater);
+            while(unhitUserShips.contains(coords[0] + "," + coords[1])){
+                cpuPoints ++;
+                unhitUserShips.remove(unhitUserShips.indexOf(coords[0] + "," + coords[1]));
+                userButtons[coords[0]][coords[1]].setIcon(hitShip);
+                value = true;
+            }
+        }
+
+        System.out.println("User Points: " + userPoints + "\nComputer Points: " + cpuPoints);
         return value;
     }
 }
