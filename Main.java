@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.plaf.synth.SynthScrollBarUI;
 
 import java.awt.*;
 import java.awt.event.*;
