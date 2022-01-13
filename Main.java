@@ -34,9 +34,7 @@ public class Main implements ActionListener, KeyListener{
     int[][] submarine = new int[2][3];
     int[][] destroyer = new int[2][2];
 
-    ArrayList<int[]> unhitSquares = new ArrayList<int[]>();
-
-    int[] newSquare = new int[2];
+    ArrayList<String> unhitEnemySquares = new ArrayList<String>();
 
     public Main(ImageIcon water) {
         this.water = water;
@@ -57,6 +55,7 @@ public class Main implements ActionListener, KeyListener{
 
     static Random rand = new Random();
     static File enemyBoard = new File("OpponentPresets/" + rand.nextInt(6) + ".txt");
+    // static File enemyBoard = new File("OpponentPresets/6.txt");
     static Scanner inp;
 
 
@@ -93,7 +92,7 @@ public class Main implements ActionListener, KeyListener{
 
         userPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        userPane.setDividerLocation(800);
+        userPane.setDividerLocation(height*100);
         userPane.setDividerSize(0);
 
         userFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
@@ -220,6 +219,24 @@ public class Main implements ActionListener, KeyListener{
         }
     }
 
+    public void createEnemyList(){
+        for(int i=0;i<5;i++){
+            unhitEnemySquares.add(enemyCarrier[0][i] + "," + enemyCarrier[1][i]);
+        }
+
+        for(int i=0;i<4;i++){
+            unhitEnemySquares.add(enemyBattleship[0][i] + "," + enemyBattleship[1][i]);
+        }
+
+        for(int i=0;i<3;i++){
+            unhitEnemySquares.add(enemySubmarine[0][i] + "," + enemySubmarine[1][i]);
+        }
+
+        for(int i=0;i<2;i++){
+            unhitEnemySquares.add(enemyDestroyer[0][i] + "," + enemyDestroyer[1][i]);
+        }
+    }
+
 
     public void actionPerformed(ActionEvent e) {
         String[] fields = e.getActionCommand().split(",");
@@ -236,8 +253,6 @@ public class Main implements ActionListener, KeyListener{
                                     carrier[0][i] = coords[0];
                                     carrier[1][i] = coords[1] + i;
                                     userButtons[carrier[0][i]][carrier[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0]; newSquare[1] = coords[1] + i;
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                             case 4:
@@ -245,8 +260,6 @@ public class Main implements ActionListener, KeyListener{
                                     battleship[0][i] = coords[0];
                                     battleship[1][i] = coords[1] + i;
                                     userButtons[battleship[0][i]][battleship[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0]; newSquare[1] = coords[1] + i;
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                             case 3:
@@ -254,8 +267,6 @@ public class Main implements ActionListener, KeyListener{
                                     submarine[0][i] = coords[0];
                                     submarine[1][i] = coords[1] + i;
                                     userButtons[submarine[0][i]][submarine[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0]; newSquare[1] = coords[1] + i;
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                             case 2:
@@ -263,8 +274,6 @@ public class Main implements ActionListener, KeyListener{
                                     destroyer[0][i] = coords[0];
                                     destroyer[1][i] = coords[1] + i;
                                     userButtons[destroyer[0][i]][destroyer[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0]; newSquare[1] = coords[1] + i;
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                         }
@@ -278,7 +287,8 @@ public class Main implements ActionListener, KeyListener{
                         else{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
-                            showEnemyShips();
+                            createEnemyList();
+                            // showEnemyShips();
                             opponentFrame.setVisible(true);
                             printAllShips();
                         }
@@ -295,8 +305,6 @@ public class Main implements ActionListener, KeyListener{
                                     carrier[0][i] = coords[0] + i;
                                     carrier[1][i] = coords[1];
                                     userButtons[carrier[0][i]][carrier[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0] + i; newSquare[1] = coords[1];
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                             case 4:
@@ -304,8 +312,6 @@ public class Main implements ActionListener, KeyListener{
                                     battleship[0][i] = coords[0] + i;
                                     battleship[1][i] = coords[1];
                                     userButtons[battleship[0][i]][battleship[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0] + i; newSquare[1] = coords[1];
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                             case 3:
@@ -313,8 +319,6 @@ public class Main implements ActionListener, KeyListener{
                                     submarine[0][i] = coords[0] + i;
                                     submarine[1][i] = coords[1];
                                     userButtons[submarine[0][i]][submarine[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0] + i; newSquare[1] = coords[1];
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                             case 2:
@@ -322,8 +326,6 @@ public class Main implements ActionListener, KeyListener{
                                     destroyer[0][i] = coords[0] + i;
                                     destroyer[1][i] = coords[1];
                                     userButtons[destroyer[0][i]][destroyer[1][i]].setIcon(ship);
-                                    newSquare[0] = coords[0] + i; newSquare[1] = coords[1];
-                                    unhitSquares.add(newSquare);
                                 }
                                 break;
                         }
@@ -337,7 +339,8 @@ public class Main implements ActionListener, KeyListener{
                         else{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
-                            showEnemyShips();
+                            createEnemyList();
+                            // showEnemyShips();
                             opponentFrame.setVisible(true);
                             printAllShips();
                         }
@@ -349,7 +352,12 @@ public class Main implements ActionListener, KeyListener{
             }
         }
         else if(boardID == 1){
-            handleHit(coords);
+            if(!handleHit(coords)){
+                System.out.println("Miss");
+            }
+            else{
+                System.out.println("Hit");
+            }
         }
 
         // System.out.println("Button Pressed: " + coords[0] + ", " + coords[1]);
@@ -392,12 +400,21 @@ public class Main implements ActionListener, KeyListener{
     boolean userWon = false;
     boolean cpuWon = false;
 
-    public void handleHit(int[] coords){
+    public boolean handleHit(int[] coords){
         cpuButtons[coords[0]][coords[1]].setIcon(hitWater);
-        // if(unhitSquares.contains(coords)) cpuButtons[coords[0]][coords[1]].setIcon(hitShip);
-        while(unhitSquares.contains(coords)){
-            unhitSquares.remove(coords);
+        // System.out.println(unhitSquares);
+        // for(int i=0;i<unhitEnemySquares.size();i++){
+        //     System.out.println(unhitEnemySquares.get(i));
+        //     // System.out.println();
+        // }
+
+        boolean value = false;
+        while(unhitEnemySquares.contains(coords[0] + "," + coords[1])){
+            unhitEnemySquares.remove(unhitEnemySquares.indexOf(coords[0] + "," + coords[1]));
             cpuButtons[coords[0]][coords[1]].setIcon(hitShip);
+            value = true;
         }
+
+        return value;
     }
 }
