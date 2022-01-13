@@ -2,6 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+import java.util.Random;
+
 public class Main implements ActionListener, KeyListener{
 
     ImageIcon water = new ImageIcon("Assets/Water.png");
@@ -24,15 +30,31 @@ public class Main implements ActionListener, KeyListener{
     int[][] submarine = new int[2][3];
     int[][] destroyer = new int[2][2];
 
+    String[][] enemyCarrier = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
+    String[][] enemyBattleship = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
+    String[][] enemySubmarine = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
+    String[][] enemyDestroyer = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
+
     int currentLength = 5;
     boolean isVertical = true;
     boolean boatsPlaced = false;
 
     int[][] tempPlacement = new int[2][5];
 
+    JFrame opponentFrame;
 
-    public static void main(String[] args) {
+    static Random rand = new Random();
+    static File enemyBoard = new File("OpponentPresets/" + rand.nextInt(6) + ".txt");
+    static Scanner inp;
+
+
+    public static void main(String[] args) throws FileNotFoundException {
+        createEnemyShips();
         new Main(Color.BLACK, Color.WHITE);
+    }
+
+    public static void createEnemyShips() throws FileNotFoundException{
+        inp = new Scanner(enemyBoard);
     }
 
 
@@ -72,7 +94,7 @@ public class Main implements ActionListener, KeyListener{
 
 
 
-        JFrame opponentFrame = new JFrame();
+        opponentFrame = new JFrame();
         JPanel opponentPanel = new JPanel();
         JPanel opponentFooter = new JPanel();
 
@@ -111,25 +133,81 @@ public class Main implements ActionListener, KeyListener{
 
         for(int i=0;i<height;i++){
             for(int ii=0;ii<width;ii++){
-                JButton x =  cpuButtons[ii][i] = new JButton("" + ii + "," + i + "," + 1);
+                JButton x =  cpuButtons[ii][i] = new JButton("" + ii + "," + i + "," + 0);
                 x.setForeground(squareColour);
-                x.setBorder(null);
+                x.setHorizontalAlignment(SwingConstants.LEFT);
+                x.setVerticalAlignment(SwingConstants.TOP);
+                x.setIcon(water);
+                // x.setBorder(null);
                 // x.setBorderPainted(false);
                 x.setBackground(squareColour);
                 x.setOpaque(true);
-                x.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, borderColour));
+                x.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, borderColour));
                 x.addActionListener(this);
+                x.addKeyListener(this);
                 opponentPanel.add(x);
-                }
             }
+        }
 
         userInstruction = new JLabel();
-        userInstruction.setText("Select placement for your ship with length : " + currentLength);
+        userInstruction.setHorizontalAlignment(SwingConstants.CENTER);
+        userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
+        if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
+        else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
         userFooter.add(userInstruction);
 
         userFrame.setVisible(true);
-        // opponentFrame.setVisible(true);
     }
+
+    public void printAllShips(){
+
+        for(int i=0;i<2;i++){
+            for(int ii=0;ii<5;ii++){
+                System.out.print(carrier[i][ii] + ", ");
+            }
+            System.out.println();
+        }
+
+        for(int i=0;i<2;i++){
+            for(int ii=0;ii<4;ii++){
+                System.out.print(battleship[i][ii] + ", ");
+            }
+            System.out.println();
+        }
+
+        for(int i=0;i<2;i++){
+            for(int ii=0;ii<3;ii++){
+                System.out.print(submarine[i][ii] + ", ");
+            }
+            System.out.println();
+        }
+
+        for(int i=0;i<2;i++){
+            for(int ii=0;ii<2;ii++){
+                System.out.print(destroyer[i][ii] + ", ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void showEnemyShips(){
+        for(int i=0;i<5;i++){
+            cpuButtons[Integer.parseInt(enemyCarrier[0][i])][Integer.parseInt(enemyCarrier[1][i])].setIcon(ship);
+        }
+
+        for(int i=0;i<4;i++){
+            cpuButtons[Integer.parseInt(enemyBattleship[0][i])][Integer.parseInt(enemyBattleship[1][i])].setIcon(ship);
+        }
+
+        for(int i=0;i<3;i++){
+            cpuButtons[Integer.parseInt(enemySubmarine[0][i])][Integer.parseInt(enemySubmarine[1][i])].setIcon(ship);
+        }
+
+        for(int i=0;i<2;i++){
+            cpuButtons[Integer.parseInt(enemyDestroyer[0][i])][Integer.parseInt(enemyDestroyer[1][i])].setIcon(ship);
+        }
+    }
+
 
     public void actionPerformed(ActionEvent e) {
         String[] fields = e.getActionCommand().split(",");
@@ -173,11 +251,16 @@ public class Main implements ActionListener, KeyListener{
 
                         if(currentLength > 2){
                             currentLength -= 1;
-                            userInstruction.setText("Select placement for your ship with length : " + currentLength);
+                            userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
+                            if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
+                            else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
                         }
                         else{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
+                            showEnemyShips();
+                            opponentFrame.setVisible(true);
+                            printAllShips();
                         }
                     }
                     else{
@@ -219,11 +302,16 @@ public class Main implements ActionListener, KeyListener{
 
                         if(currentLength > 2){
                             currentLength -= 1;
-                            userInstruction.setText("Select placement for your ship with length : " + currentLength);
+                            userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
+                            if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
+                            else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
                         }
                         else{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
+                            showEnemyShips();
+                            opponentFrame.setVisible(true);
+                            printAllShips();
                         }
                     }
                     else{
@@ -252,6 +340,9 @@ public class Main implements ActionListener, KeyListener{
     public void keyTyped(KeyEvent e) {
         if(e.getKeyChar() == 'r' || e.getKeyChar() == 'R'){
             isVertical = !isVertical;
+            userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
+            if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
+            else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
         }
         
     }
