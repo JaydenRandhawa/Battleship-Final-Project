@@ -5,6 +5,7 @@ import java.awt.event.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
@@ -72,9 +73,67 @@ public class Main implements ActionListener, KeyListener{
 
 
     public static void main(String[] args) throws FileNotFoundException {
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
         createEnemyShips();
         new Main(Color.BLACK, Color.WHITE);
     }
+
+    JMenuItem saveBoard, showEnemy, hideEnemy, printShips, restart;
+
+    public JMenuBar createMenuBar(){
+        JMenuBar menuBar = new JMenuBar();
+        JMenu game, debug;
+        restart = new JMenuItem("Restart");
+
+
+        game = new JMenu("Game");
+        saveBoard = new JMenuItem("Make Preset From Layout");
+        game.add(saveBoard);
+
+        debug = new JMenu("Debug");
+        showEnemy = new JMenuItem("Show Enemy Ships");
+        hideEnemy = new JMenuItem("Hide Enemy Ships");
+        printShips = new JMenuItem("Print Ships");
+        debug.add(showEnemy);
+        debug.add(hideEnemy);
+        debug.add(printShips);
+
+        saveBoard.addActionListener(menuClicks);
+        showEnemy.addActionListener(menuClicks);
+        hideEnemy.addActionListener(menuClicks);
+        printShips.addActionListener(menuClicks);
+        restart.addActionListener(menuClicks);
+
+
+        menuBar.add(game);
+        menuBar.add(debug);
+        menuBar.add(restart);
+
+        return menuBar;
+    }
+
+    ActionListener menuClicks = new ActionListener(){
+        public void actionPerformed(ActionEvent e) {
+            if(e.getSource() == saveBoard){
+                System.out.println("Board saved");
+            }
+            else if(e.getSource() == showEnemy){
+                Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
+            }
+            else if(e.getSource() == hideEnemy){
+                System.out.println("Does anything work?");
+                
+            }
+            else if(e.getSource() == printShips){
+                Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                
+            }
+            else if(e.getSource() == restart){
+                System.out.println("Restart");
+            }
+            
+        }
+    };
 
     public static void createEnemyShips() throws FileNotFoundException{
         inp = new Scanner(enemyBoard);
@@ -110,6 +169,7 @@ public class Main implements ActionListener, KeyListener{
         userFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         userFrame.setResizable(false);
         userFrame.add(userPane, BorderLayout.CENTER);
+        userFrame.setJMenuBar(createMenuBar());
         userFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         userFrame.setTitle("Your Board");
         userFrame.pack();
@@ -135,6 +195,7 @@ public class Main implements ActionListener, KeyListener{
         opponentFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         opponentFrame.setResizable(false);
         opponentFrame.add(opponentPane, BorderLayout.CENTER);
+        opponentFrame.setJMenuBar(createMenuBar());
         opponentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         opponentFrame.setTitle("Opponent Board");
         opponentFrame.pack();
@@ -154,7 +215,7 @@ public class Main implements ActionListener, KeyListener{
                 x.setBackground(squareColour);
                 x.setOpaque(true);
                 x.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, borderColour));
-                x.addActionListener(this);
+                x.addActionListener(boardClicks);
                 x.addKeyListener(this);
                 userPanel.add(x);
             }
@@ -174,7 +235,7 @@ public class Main implements ActionListener, KeyListener{
                 x.setBackground(squareColour);
                 x.setOpaque(true);
                 x.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, borderColour));
-                x.addActionListener(this);
+                x.addActionListener(boardClicks);
                 x.addKeyListener(this);
                 opponentPanel.add(x);
             }
@@ -217,147 +278,150 @@ public class Main implements ActionListener, KeyListener{
         }
     }
 
-
-    public void actionPerformed(ActionEvent e) {
-        String[] fields = e.getActionCommand().split(",");
-        int boardID = Integer.parseInt(fields[2]);
-        int coords[] = new int[]{Integer.parseInt(fields[0]), Integer.parseInt(fields[1])};
-
-        if(boardID == 0){
-            if(!boatsPlaced){
-                if(isVertical){
-                    if(coords[1] + currentLength - 1 < width ){
-                        switch(currentLength){
-                            case 5:
-                                for(int i=0;i<currentLength;i++){
-                                    carrier[0][i] = coords[0];
-                                    carrier[1][i] = coords[1] + i;
-                                    userButtons[carrier[0][i]][carrier[1][i]].setIcon(ship);
-                                }
-                                break;
-                            case 4:
-                                for(int i=0;i<currentLength;i++){
-                                    battleship[0][i] = coords[0];
-                                    battleship[1][i] = coords[1] + i;
-                                    userButtons[battleship[0][i]][battleship[1][i]].setIcon(ship);
-                                }
-                                break;
-                            case 3:
-                                for(int i=0;i<currentLength;i++){
-                                    submarine[0][i] = coords[0];
-                                    submarine[1][i] = coords[1] + i;
-                                    userButtons[submarine[0][i]][submarine[1][i]].setIcon(ship);
-                                }
-                                break;
-                            case 2:
-                                for(int i=0;i<currentLength;i++){
-                                    destroyer[0][i] = coords[0];
-                                    destroyer[1][i] = coords[1] + i;
-                                    userButtons[destroyer[0][i]][destroyer[1][i]].setIcon(ship);
-                                }
-                                break;
-                        }
-
-                        if(currentLength > 2){
-                            currentLength -= 1;
-                            userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
-                            if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
-                            else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
+    ActionListener boardClicks = new ActionListener(){
+        public void actionPerformed(ActionEvent e) {
+            String[] fields = e.getActionCommand().split(",");
+            int boardID = Integer.parseInt(fields[2]);
+            int coords[] = new int[]{Integer.parseInt(fields[0]), Integer.parseInt(fields[1])};
+    
+            if(boardID == 0){
+                if(!boatsPlaced){
+                    if(isVertical){
+                        if(coords[1] + currentLength - 1 < width ){
+                            switch(currentLength){
+                                case 5:
+                                    for(int i=0;i<currentLength;i++){
+                                        carrier[0][i] = coords[0];
+                                        carrier[1][i] = coords[1] + i;
+                                        userButtons[carrier[0][i]][carrier[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                                case 4:
+                                    for(int i=0;i<currentLength;i++){
+                                        battleship[0][i] = coords[0];
+                                        battleship[1][i] = coords[1] + i;
+                                        userButtons[battleship[0][i]][battleship[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                                case 3:
+                                    for(int i=0;i<currentLength;i++){
+                                        submarine[0][i] = coords[0];
+                                        submarine[1][i] = coords[1] + i;
+                                        userButtons[submarine[0][i]][submarine[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                                case 2:
+                                    for(int i=0;i<currentLength;i++){
+                                        destroyer[0][i] = coords[0];
+                                        destroyer[1][i] = coords[1] + i;
+                                        userButtons[destroyer[0][i]][destroyer[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                            }
+    
+                            if(currentLength > 2){
+                                currentLength -= 1;
+                                userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
+                                if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
+                                else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
+                            }
+                            else{
+                                boatsPlaced = true;
+                                userInstruction.setText("All ships placed.");
+                                createPlayerLists();
+                                // Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
+                                opponentFrame.setVisible(true);
+    
+                                // Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                            }
                         }
                         else{
-                            boatsPlaced = true;
-                            userInstruction.setText("All ships placed.");
-                            createPlayerLists();
-                            // Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
-                            opponentFrame.setVisible(true);
-
-                            // Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                            userInstruction.setText("Placement out of bounds");
                         }
                     }
                     else{
-                        userInstruction.setText("Placement out of bounds");
-                    }
-                }
-                else{
-                    if(coords[0] + currentLength - 1 < height ){
-                        switch(currentLength){
-                            case 5:
-                                for(int i=0;i<currentLength;i++){
-                                    carrier[0][i] = coords[0] + i;
-                                    carrier[1][i] = coords[1];
-                                    userButtons[carrier[0][i]][carrier[1][i]].setIcon(ship);
-                                }
-                                break;
-                            case 4:
-                                for(int i=0;i<currentLength;i++){
-                                    battleship[0][i] = coords[0] + i;
-                                    battleship[1][i] = coords[1];
-                                    userButtons[battleship[0][i]][battleship[1][i]].setIcon(ship);
-                                }
-                                break;
-                            case 3:
-                                for(int i=0;i<currentLength;i++){
-                                    submarine[0][i] = coords[0] + i;
-                                    submarine[1][i] = coords[1];
-                                    userButtons[submarine[0][i]][submarine[1][i]].setIcon(ship);
-                                }
-                                break;
-                            case 2:
-                                for(int i=0;i<currentLength;i++){
-                                    destroyer[0][i] = coords[0] + i;
-                                    destroyer[1][i] = coords[1];
-                                    userButtons[destroyer[0][i]][destroyer[1][i]].setIcon(ship);
-                                }
-                                break;
-                        }
-
-                        if(currentLength > 2){
-                            currentLength -= 1;
-                            userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
-                            if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
-                            else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
+                        if(coords[0] + currentLength - 1 < height ){
+                            switch(currentLength){
+                                case 5:
+                                    for(int i=0;i<currentLength;i++){
+                                        carrier[0][i] = coords[0] + i;
+                                        carrier[1][i] = coords[1];
+                                        userButtons[carrier[0][i]][carrier[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                                case 4:
+                                    for(int i=0;i<currentLength;i++){
+                                        battleship[0][i] = coords[0] + i;
+                                        battleship[1][i] = coords[1];
+                                        userButtons[battleship[0][i]][battleship[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                                case 3:
+                                    for(int i=0;i<currentLength;i++){
+                                        submarine[0][i] = coords[0] + i;
+                                        submarine[1][i] = coords[1];
+                                        userButtons[submarine[0][i]][submarine[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                                case 2:
+                                    for(int i=0;i<currentLength;i++){
+                                        destroyer[0][i] = coords[0] + i;
+                                        destroyer[1][i] = coords[1];
+                                        userButtons[destroyer[0][i]][destroyer[1][i]].setIcon(ship);
+                                    }
+                                    break;
+                            }
+    
+                            if(currentLength > 2){
+                                currentLength -= 1;
+                                userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
+                                if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
+                                else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
+                            }
+                            else{
+                                boatsPlaced = true;
+                                userInstruction.setText("All ships placed.");
+                                createPlayerLists();
+                                // Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
+                                opponentFrame.setVisible(true);
+                                // Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                            }
                         }
                         else{
-                            boatsPlaced = true;
-                            userInstruction.setText("All ships placed.");
-                            createPlayerLists();
-                            // Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
-                            opponentFrame.setVisible(true);
-                            // Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                            userInstruction.setText("Placement out of bounds");
                         }
-                    }
-                    else{
-                        userInstruction.setText("Placement out of bounds");
                     }
                 }
             }
-        }
-        else if(boardID == 1){
-            if(!handleHit(coords, 0)){
-                System.out.println("Miss");
-                String hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
-                int[] hitCoords= new int[2];
-
-                hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
-                hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
-
-                remainingEnemySquares.remove(hitPos);
-
-                while(handleHit(hitCoords, 1) && !gameOver){
-                    hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
-
+            else if(boardID == 1){
+                if(!handleHit(coords, 0)){
+                    System.out.println("Miss");
+                    String hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
+                    int[] hitCoords= new int[2];
+    
                     hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
                     hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
-
+    
                     remainingEnemySquares.remove(hitPos);
+    
+                    while(handleHit(hitCoords, 1) && !gameOver){
+                        hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
+    
+                        hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
+                        hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
+    
+                        remainingEnemySquares.remove(hitPos);
+                    }
+    
                 }
-
-            }
-            else{
-                System.out.println("Hit");
+                else{
+                    System.out.println("Hit");
+                }
             }
         }
-    }
+
+    };
+
     public void keyTyped(KeyEvent e) {
         if(e.getKeyChar() == 'r' || e.getKeyChar() == 'R'){
             isVertical = !isVertical;
@@ -374,6 +438,11 @@ public class Main implements ActionListener, KeyListener{
     }
 
     public void keyReleased(KeyEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
         
     }
