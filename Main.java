@@ -121,7 +121,7 @@ public class Main implements ActionListener, KeyListener{
                 Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
             }
             else if(e.getSource() == hideEnemy){
-                System.out.println("Does anything work?");
+                Debug.hideEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, water);
                 
             }
             else if(e.getSource() == printShips){

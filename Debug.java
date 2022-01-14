@@ -52,4 +52,22 @@ public class Debug {
             cpuButtons[Integer.parseInt(enemyDestroyer[0][i])][Integer.parseInt(enemyDestroyer[1][i])].setIcon(ship);
         }
     }
+
+    public static void hideEnemyShips(JButton[][] cpuButtons, String[][] enemyCarrier, String[][] enemyBattleship, String[][] enemySubmarine, String[][] enemyDestroyer, ImageIcon water){
+        for(int i=0;i<5;i++){
+            cpuButtons[Integer.parseInt(enemyCarrier[0][i])][Integer.parseInt(enemyCarrier[1][i])].setIcon(water);
+        }
+
+        for(int i=0;i<4;i++){
+            cpuButtons[Integer.parseInt(enemyBattleship[0][i])][Integer.parseInt(enemyBattleship[1][i])].setIcon(water);
+        }
+
+        for(int i=0;i<3;i++){
+            cpuButtons[Integer.parseInt(enemySubmarine[0][i])][Integer.parseInt(enemySubmarine[1][i])].setIcon(water);
+        }
+
+        for(int i=0;i<2;i++){
+            cpuButtons[Integer.parseInt(enemyDestroyer[0][i])][Integer.parseInt(enemyDestroyer[1][i])].setIcon(water);
+        }
+    }
 }
