@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
@@ -26,6 +27,7 @@ public class Main implements ActionListener, KeyListener{
     JButton[][] cpuButtons = new JButton[width][height];
 
     JLabel userInstruction;
+    JLabel opponentInstruction;
     
     int[] prevSquare = new int[2];
 
@@ -55,6 +57,8 @@ public class Main implements ActionListener, KeyListener{
     int currentLength = 5;
     boolean isVertical = true;
     boolean boatsPlaced = false;
+
+    boolean gameOver = false;
 
     int[][] tempPlacement = new int[2][5];
 
@@ -120,9 +124,17 @@ public class Main implements ActionListener, KeyListener{
         opponentPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         opponentPanel.setLayout(new GridLayout(height, width));
 
-        opponentFrame.setPreferredSize(new Dimension(800, 800));
+        opponentFooter.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        opponentFooter.setLayout(new GridBagLayout());
+
+        JSplitPane opponentPane = new JSplitPane(SwingConstants.HORIZONTAL, opponentPanel, opponentFooter);
+
+        opponentPane.setDividerLocation(height*100);
+        opponentPane.setDividerSize(0);
+
+        opponentFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         opponentFrame.setResizable(false);
-        opponentFrame.add(opponentPanel, BorderLayout.CENTER);
+        opponentFrame.add(opponentPane, BorderLayout.CENTER);
         opponentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         opponentFrame.setTitle("Opponent Board");
         opponentFrame.pack();
@@ -176,6 +188,11 @@ public class Main implements ActionListener, KeyListener{
         userFooter.add(userInstruction);
 
         userFrame.setVisible(true);
+
+        opponentInstruction = new JLabel();
+        opponentInstruction.setHorizontalAlignment(SwingConstants.CENTER);
+        opponentInstruction.setText("Select a coordiante to fire at:");
+        opponentFooter.add(opponentInstruction);
     }
 
     public void createPlayerLists(){
@@ -251,10 +268,10 @@ public class Main implements ActionListener, KeyListener{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
                             createPlayerLists();
-                            Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
+                            // Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
                             opponentFrame.setVisible(true);
 
-                            Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                            // Debug.printAllShips(carrier, battleship, submarine, destroyer);
                         }
                     }
                     else{
@@ -304,9 +321,9 @@ public class Main implements ActionListener, KeyListener{
                             boatsPlaced = true;
                             userInstruction.setText("All ships placed.");
                             createPlayerLists();
-                            Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
+                            // Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
                             opponentFrame.setVisible(true);
-                            Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                            // Debug.printAllShips(carrier, battleship, submarine, destroyer);
                         }
                     }
                     else{
@@ -326,7 +343,7 @@ public class Main implements ActionListener, KeyListener{
 
                 remainingEnemySquares.remove(hitPos);
 
-                while(handleHit(hitCoords, 1)){
+                while(handleHit(hitCoords, 1) && !gameOver){
                     hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
 
                     hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
@@ -369,26 +386,40 @@ public class Main implements ActionListener, KeyListener{
         boolean value = false;
 
         if(boardID == 0){
+            opponentInstruction.setText("Miss at: " + coords[0] + ", " + coords[1]);
             cpuButtons[coords[0]][coords[1]].setIcon(hitWater);
             while(unhitEnemyShips.contains(coords[0] + "," + coords[1])){
                 userPoints ++;
                 unhitEnemyShips.remove(unhitEnemyShips.indexOf(coords[0] + "," + coords[1]));
+                opponentInstruction.setText("Hit at: " + coords[0] + ", " + coords[1]);
                 cpuButtons[coords[0]][coords[1]].setIcon(hitShip);
                 value = true;
             }
         }
 
         if(boardID == 1){
+            userInstruction.setText("Miss at: " + coords[0] + ", " + coords[1]);
             userButtons[coords[0]][coords[1]].setIcon(hitWater);
             while(unhitUserShips.contains(coords[0] + "," + coords[1])){
                 cpuPoints ++;
                 unhitUserShips.remove(unhitUserShips.indexOf(coords[0] + "," + coords[1]));
+                userInstruction.setText("Hit at: " + coords[0] + ", " + coords[1]);
                 userButtons[coords[0]][coords[1]].setIcon(hitShip);
                 value = true;
             }
         }
 
         System.out.println("User Points: " + userPoints + "\nComputer Points: " + cpuPoints);
+
+        if(userPoints == 14){
+            gameOver = true;
+            JOptionPane.showMessageDialog(null, "You Won");
+        }
+        else if(cpuPoints == 14){
+            gameOver = true;
+            JOptionPane.showMessageDialog(null, "You Lost");
+        }
+
         return value;
     }
 }
