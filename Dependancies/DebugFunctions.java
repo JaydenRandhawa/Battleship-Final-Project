@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Debug {
+public class DebugFunctions {
     public static void printAllShips(int[][] carrier, int[][] battleship, int[][] submarine, int[][] destroyer){
 
         for(int i=0;i<2;i++){

@@ -1,4 +1,4 @@
-import Dependancies.Debug;
+import Dependancies.DebugFunctions;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -30,23 +30,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-
 import java.util.Random;
 
 public class Game implements ActionListener, KeyListener{
 
     ImageIcon water = new ImageIcon("Assets/Water.png");
     ImageIcon hitWater = new ImageIcon("Assets/HitWater.png");
-    ImageIcon ship = new ImageIcon("Assets/Ship.png");
+    static ImageIcon ship = new ImageIcon("Assets/Ship.png");
     ImageIcon hitShip = new ImageIcon("Assets/HitShip.png");
 
-    int width = 8;
-    int height = 8;
+    static int width = 8;
+    static int height = 8;
 
-    JButton[][] userButtons = new JButton[width][height];
+    static JButton[][] userButtons = new JButton[width][height];
     JButton[][] cpuButtons = new JButton[width][height];
 
     static JFrame userFrame;
@@ -57,10 +57,10 @@ public class Game implements ActionListener, KeyListener{
     
     int[] prevSquare = new int[2];
 
-    int[][] carrier = new int[2][5];
-    int[][] battleship = new int[2][4];
-    int[][] submarine = new int[2][3];
-    int[][] destroyer = new int[2][2];
+    static int[][] carrier = new int[2][5];
+    static int[][] battleship = new int[2][4];
+    static int[][] submarine = new int[2][3];
+    static int[][] destroyer = new int[2][2];
 
     ArrayList<String> unhitUserShips = new ArrayList<String>();
     ArrayList<String> unhitEnemyShips = new ArrayList<String>();
@@ -82,7 +82,8 @@ public class Game implements ActionListener, KeyListener{
 
     int currentLength = 5;
     boolean isVertical = true;
-    boolean boatsPlaced = false;
+
+    static boolean boatsPlaced;
 
     boolean gameOver = false;
 
@@ -96,15 +97,16 @@ public class Game implements ActionListener, KeyListener{
     static Scanner inp;
 
 
-    public static void start() throws IOException {
+    public static void start() throws IOException, InterruptedException {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
+        boatsPlaced = false;
         // System.out.println(getUserInput("Enter Text"));
         createEnemyShips();
         new Game(Color.BLACK, Color.WHITE);
     }
 
-    JMenuItem saveBoard, showEnemy, hideEnemy, printShips, restart;
+    JMenuItem saveBoard, loadBoard, showEnemy, hideEnemy, printShips, restart;
 
     public JMenuBar createMenuBar(){
         JMenuBar menuBar = new JMenuBar();
@@ -114,7 +116,9 @@ public class Game implements ActionListener, KeyListener{
 
         game = new JMenu("Game");
         saveBoard = new JMenuItem("Make Preset From Layout");
+        loadBoard = new JMenuItem("Load Board Preset");
         game.add(saveBoard);
+        game.add(loadBoard);
 
         debug = new JMenu("Debug");
         showEnemy = new JMenuItem("Show Enemy Ships");
@@ -125,6 +129,7 @@ public class Game implements ActionListener, KeyListener{
         debug.add(printShips);
 
         saveBoard.addActionListener(menuClicks);
+        loadBoard.addActionListener(menuClicks);
         showEnemy.addActionListener(menuClicks);
         hideEnemy.addActionListener(menuClicks);
         printShips.addActionListener(menuClicks);
@@ -141,22 +146,100 @@ public class Game implements ActionListener, KeyListener{
     ActionListener menuClicks = new ActionListener(){
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == saveBoard){
-                try {
-                    Battleship.restart();
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+
+                JFrame userInputFrame = new JFrame();
+                JPanel userInputPanel = new JPanel();
+        
+                JLabel label = new JLabel("Enter the desired name for the save file:");
+                JTextField userInputField = new JTextField();
+                JButton submitButton = new JButton("Submit");
+        
+                submitButton.addActionListener(new ActionListener(){
+        
+                    public void actionPerformed(ActionEvent e) {
+                        String fileName = userInputField.getText();
+                        try {
+                            if(saveUserBoard(fileName, carrier, battleship, submarine, destroyer)){
+                                userInstruction.setText("Board Preset Saved");
+                            }
+                            else{
+                                userInstruction.setText("Board Preset With That Name Already Exists");
+                            }
+                        } catch (IOException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                        userInputFrame.dispose();
+                    }
+                });
+        
+                userInputPanel.setLayout(new GridLayout(3, 1));
+        
+                userInputPanel.add(label);
+                userInputPanel.add(userInputField);
+                userInputPanel.add(submitButton);
+        
+                userInputFrame.add(userInputPanel);
+        
+                userInputFrame.setUndecorated(true);
+                userInputFrame.setPreferredSize(new Dimension(300, 80));
+                userInputFrame.setResizable(false);
+                userInputFrame.pack();
+                userInputFrame.setVisible(true);
+
+            }
+
+            else if(e.getSource() == loadBoard){
+
+                JFrame userInputFrame = new JFrame();
+                JPanel userInputPanel = new JPanel();
+        
+                JLabel label = new JLabel("Enter the name of the desired board preset:");
+                JTextField userInputField = new JTextField();
+                JButton submitButton = new JButton("Submit");
+        
+                submitButton.addActionListener(new ActionListener(){
+        
+                    public void actionPerformed(ActionEvent e) {
+                        String fileName = userInputField.getText();
+                        try {
+                            if(loadPresetLayout(fileName)){
+                                userInstruction.setText("Board Preset Loaded");
+                            }
+                            else{
+                                userInstruction.setText("There Is No Board Preset With That Name");
+                            }
+                        } catch (IOException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                        userInputFrame.dispose();
+                    }
+                });
+        
+                userInputPanel.setLayout(new GridLayout(3, 1));
+        
+                userInputPanel.add(label);
+                userInputPanel.add(userInputField);
+                userInputPanel.add(submitButton);
+        
+                userInputFrame.add(userInputPanel);
+        
+                userInputFrame.setUndecorated(true);
+                userInputFrame.setPreferredSize(new Dimension(300, 80));
+                userInputFrame.setResizable(false);
+                userInputFrame.pack();
+                userInputFrame.setVisible(true);
             }
             else if(e.getSource() == showEnemy){
-                Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
+                DebugFunctions.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
             }
             else if(e.getSource() == hideEnemy){
-                Debug.hideEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, water);
+                DebugFunctions.hideEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, water);
                 
             }
             else if(e.getSource() == printShips){
-                Debug.printAllShips(carrier, battleship, submarine, destroyer);
+                DebugFunctions.printAllShips(carrier, battleship, submarine, destroyer);
                 
             }
             else if(e.getSource() == restart){
@@ -226,7 +309,7 @@ public class Game implements ActionListener, KeyListener{
         opponentFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         opponentFrame.setResizable(false);
         opponentFrame.add(opponentPane, BorderLayout.CENTER);
-        opponentFrame.setJMenuBar(createMenuBar());
+        // opponentFrame.setJMenuBar(createMenuBar());
         opponentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         opponentFrame.setTitle("Opponent Board");
         opponentFrame.pack();
@@ -308,6 +391,119 @@ public class Game implements ActionListener, KeyListener{
             unhitUserShips.add(destroyer[0][i] + "," + destroyer[1][i]);
             unhitEnemyShips.add(enemyDestroyer[0][i] + "," + enemyDestroyer[1][i]);
         }
+    }
+
+    public static boolean saveUserBoard(String fileName, int[][] carrier, int[][] battleship, int[][] submarine, int[][] destroyer) throws IOException{
+        File saveFile = new File("UserPresets/" + fileName + ".txt");
+
+        if(saveFile.createNewFile()){
+
+            FileWriter file = new FileWriter(saveFile, true);
+
+            String currentLine = "";
+
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<5;ii++){
+                    currentLine += carrier[i][ii] + ", ";
+                }
+                file.write(currentLine.substring(0, currentLine.length()-2));
+                file.write(System.lineSeparator());
+                currentLine = "";
+            }
+    
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<4;ii++){
+                    currentLine += battleship[i][ii] + ", ";
+                }
+                file.write(currentLine.substring(0, currentLine.length()-2));
+                file.write(System.lineSeparator());
+                currentLine = "";
+            }
+    
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<3;ii++){
+                    currentLine += submarine[i][ii] + ", ";
+                }
+                file.write(currentLine.substring(0, currentLine.length()-2));
+                file.write(System.lineSeparator());
+                currentLine = "";
+            }
+    
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<2;ii++){
+                    currentLine += destroyer[i][ii] + ", ";
+                }
+                file.write(currentLine.substring(0, currentLine.length()-2));
+                file.write(System.lineSeparator());
+                currentLine = "";
+            }
+
+            file.write("STOP");
+            file.close();
+
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean loadPresetLayout(String fileName) throws FileNotFoundException{
+        File saveFile = new File("UserPresets/" + fileName + ".txt");
+
+        if(saveFile.exists()){
+            Scanner inp = new Scanner(saveFile);
+
+            String[] currentLine = inp.nextLine().split(", ");
+
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<5;ii++){
+                    carrier[i][ii] = Integer.parseInt(currentLine[ii]);
+                }
+                currentLine = inp.nextLine().split(", ");
+            }
+
+            for(int i=0;i<5;i++){
+                userButtons[carrier[0][i]][carrier[1][i]].setIcon(ship);
+            }
+    
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<4;ii++){
+                    battleship[i][ii] = Integer.parseInt(currentLine[ii]);
+                }
+                currentLine = inp.nextLine().split(", ");
+            }
+
+            for(int i=0;i<4;i++){
+                userButtons[battleship[0][i]][battleship[1][i]].setIcon(ship);
+            }
+    
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<3;ii++){
+                    submarine[i][ii] = Integer.parseInt(currentLine[ii]);
+                }
+                currentLine = inp.nextLine().split(", ");
+            }
+
+            for(int i=0;i<3;i++){
+                userButtons[submarine[0][i]][submarine[1][i]].setIcon(ship);
+            }
+    
+            for(int i=0;i<2;i++){
+                for(int ii=0;ii<2;ii++){
+                    destroyer[i][ii] = Integer.parseInt(currentLine[ii]);
+                }
+                currentLine = inp.nextLine().split(", ");
+            }
+
+            for(int i=0;i<2;i++){
+                userButtons[destroyer[0][i]][destroyer[1][i]].setIcon(ship);
+            }
+
+            boatsPlaced = true;
+
+            opponentFrame.setVisible(true);
+            return true;
+        }
+        return false;
     }
 
     ActionListener boardClicks = new ActionListener(){
@@ -478,44 +674,6 @@ public class Game implements ActionListener, KeyListener{
         // TODO Auto-generated method stub
         
     }
-
-    static String retValue;
-
-    // public static String getUserInput(String prompt) throws InterruptedException{
-    //     retValue = "";
-
-
-    //     JFrame userInputFrame = new JFrame();
-    //     JPanel userInputPanel = new JPanel();
-
-    //     JTextField userInputField = new JTextField(prompt);
-    //     JButton submitButton = new JButton("Submit");
-
-    //     submitButton.addActionListener(new ActionListener(){
-
-    //         public void actionPerformed(ActionEvent e) {
-    //             retValue = userInputField.getText();
-    //             userInputFrame.dispose();
-    //         }
-    //     });
-
-    //     userInputPanel.setLayout(new GridLayout(2, 2));
-
-    //     userInputPanel.add(userInputField);
-    //     userInputPanel.add(submitButton);
-
-    //     userInputFrame.add(userInputPanel);
-
-    //     // userInputFrame.setUndecorated(true);
-    //     userInputFrame.setPreferredSize(new Dimension(300, 300));
-    //     userInputFrame.setResizable(false);
-    //     userInputFrame.pack();
-    //     userInputFrame.setVisible(true);
-
-    //     while(retValue == "") Thread.sleep(500);
-    //     return retValue;
-
-    // }
 
     static void reset(){
         userFrame.setVisible(false);
