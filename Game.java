@@ -62,8 +62,8 @@ public class Game implements ActionListener, KeyListener{
     static int[][] submarine = new int[2][3];
     static int[][] destroyer = new int[2][2];
 
-    ArrayList<String> unhitUserShips = new ArrayList<String>();
-    ArrayList<String> unhitEnemyShips = new ArrayList<String>();
+    static ArrayList<String> unhitUserShips = new ArrayList<String>();
+    static ArrayList<String> unhitEnemyShips = new ArrayList<String>();
 
     ArrayList<String> remainingEnemySquares = new ArrayList<String>(Arrays.asList(
     "0, 0", "0, 1", "0, 2", "0, 3", "0, 4", "0, 5", "0, 6", "0, 7", 
@@ -75,6 +75,10 @@ public class Game implements ActionListener, KeyListener{
     "6, 0", "6, 1", "6, 2", "6, 3", "6, 4", "6, 5", "6, 6", "6, 7", 
     "7, 0", "7, 1", "7, 2", "7, 3", "7, 4", "7, 5", "7, 6", "7, 7"));
 
+    static File enemyBoard;
+    static Scanner inp;
+
+    
     String[][] enemyCarrier = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
     String[][] enemyBattleship = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
     String[][] enemySubmarine = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
@@ -92,17 +96,13 @@ public class Game implements ActionListener, KeyListener{
 
     Random randPos = new Random();
     static Random randFile = new Random();
-    static File enemyBoard;
     // static File enemyBoard = new File("OpponentPresets/6.txt");
-    static Scanner inp;
 
 
     public static void start() throws IOException, InterruptedException {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-        enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
-        boatsPlaced = false;
-        // System.out.println(getUserInput("Enter Text"));
         createEnemyShips();
+        boatsPlaced = false;
         new Game(Color.BLACK, Color.WHITE);
     }
 
@@ -250,6 +250,8 @@ public class Game implements ActionListener, KeyListener{
     };
 
     public static void createEnemyShips() throws IOException{
+        enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
+        System.out.println(enemyBoard);
         inp = new Scanner(enemyBoard);
     }
 
@@ -302,6 +304,8 @@ public class Game implements ActionListener, KeyListener{
         opponentFooter.setLayout(new GridBagLayout());
 
         JSplitPane opponentPane = new JSplitPane(SwingConstants.HORIZONTAL, opponentPanel, opponentFooter);
+
+        opponentPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         opponentPane.setDividerLocation(height*100);
         opponentPane.setDividerSize(0);
@@ -446,19 +450,19 @@ public class Game implements ActionListener, KeyListener{
         return false;
     }
 
-    public static boolean loadPresetLayout(String fileName) throws FileNotFoundException{
+    public boolean loadPresetLayout(String fileName) throws FileNotFoundException{
         File saveFile = new File("UserPresets/" + fileName + ".txt");
 
         if(saveFile.exists()){
-            Scanner inp = new Scanner(saveFile);
+            Scanner sf = new Scanner(saveFile);
 
-            String[] currentLine = inp.nextLine().split(", ");
+            String[] currentLine = sf.nextLine().split(", ");
 
             for(int i=0;i<2;i++){
                 for(int ii=0;ii<5;ii++){
                     carrier[i][ii] = Integer.parseInt(currentLine[ii]);
                 }
-                currentLine = inp.nextLine().split(", ");
+                currentLine = sf.nextLine().split(", ");
             }
 
             for(int i=0;i<5;i++){
@@ -469,7 +473,7 @@ public class Game implements ActionListener, KeyListener{
                 for(int ii=0;ii<4;ii++){
                     battleship[i][ii] = Integer.parseInt(currentLine[ii]);
                 }
-                currentLine = inp.nextLine().split(", ");
+                currentLine = sf.nextLine().split(", ");
             }
 
             for(int i=0;i<4;i++){
@@ -480,7 +484,7 @@ public class Game implements ActionListener, KeyListener{
                 for(int ii=0;ii<3;ii++){
                     submarine[i][ii] = Integer.parseInt(currentLine[ii]);
                 }
-                currentLine = inp.nextLine().split(", ");
+                currentLine = sf.nextLine().split(", ");
             }
 
             for(int i=0;i<3;i++){
@@ -491,7 +495,7 @@ public class Game implements ActionListener, KeyListener{
                 for(int ii=0;ii<2;ii++){
                     destroyer[i][ii] = Integer.parseInt(currentLine[ii]);
                 }
-                currentLine = inp.nextLine().split(", ");
+                currentLine = sf.nextLine().split(", ");
             }
 
             for(int i=0;i<2;i++){
@@ -499,6 +503,7 @@ public class Game implements ActionListener, KeyListener{
             }
 
             boatsPlaced = true;
+            createPlayerLists();
 
             opponentFrame.setVisible(true);
             return true;
