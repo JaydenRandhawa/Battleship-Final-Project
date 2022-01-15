@@ -1,20 +1,42 @@
-import javax.swing.*;
+import Dependancies.Debug;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.BorderFactory;
+import javax.swing.SwingConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventListener;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
 import java.util.Random;
 
-public class Main implements ActionListener, KeyListener{
+public class Game implements ActionListener, KeyListener{
 
     ImageIcon water = new ImageIcon("Assets/Water.png");
     ImageIcon hitWater = new ImageIcon("Assets/HitWater.png");
@@ -26,6 +48,9 @@ public class Main implements ActionListener, KeyListener{
 
     JButton[][] userButtons = new JButton[width][height];
     JButton[][] cpuButtons = new JButton[width][height];
+
+    static JFrame userFrame;
+    static JFrame opponentFrame;
 
     JLabel userInstruction;
     JLabel opponentInstruction;
@@ -63,19 +88,20 @@ public class Main implements ActionListener, KeyListener{
 
     int[][] tempPlacement = new int[2][5];
 
-    JFrame opponentFrame;
 
     Random randPos = new Random();
     static Random randFile = new Random();
-    static File enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
+    static File enemyBoard;
     // static File enemyBoard = new File("OpponentPresets/6.txt");
     static Scanner inp;
 
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void start() throws IOException {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+        enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
+        // System.out.println(getUserInput("Enter Text"));
         createEnemyShips();
-        new Main(Color.BLACK, Color.WHITE);
+        new Game(Color.BLACK, Color.WHITE);
     }
 
     JMenuItem saveBoard, showEnemy, hideEnemy, printShips, restart;
@@ -115,7 +141,12 @@ public class Main implements ActionListener, KeyListener{
     ActionListener menuClicks = new ActionListener(){
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == saveBoard){
-                System.out.println("Board saved");
+                try {
+                    Battleship.restart();
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
             }
             else if(e.getSource() == showEnemy){
                 Debug.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
@@ -135,17 +166,17 @@ public class Main implements ActionListener, KeyListener{
         }
     };
 
-    public static void createEnemyShips() throws FileNotFoundException{
+    public static void createEnemyShips() throws IOException{
         inp = new Scanner(enemyBoard);
     }
 
 
-    public Main(Color borderColour, Color squareColour) {
+    public Game(Color borderColour, Color squareColour) {
 
         // SECTION User panel, footer, frame initialization.
         JPanel userPanel = new JPanel();
         JPanel userFooter = new JPanel();
-        JFrame userFrame = new JFrame();
+        userFrame = new JFrame();
         // !SECTION
 
         // SECTION User panel, footer, frame setup
@@ -254,6 +285,7 @@ public class Main implements ActionListener, KeyListener{
         opponentInstruction.setHorizontalAlignment(SwingConstants.CENTER);
         opponentInstruction.setText("Select a coordiante to fire at:");
         opponentFooter.add(opponentInstruction);
+
     }
 
     public void createPlayerLists(){
@@ -445,6 +477,49 @@ public class Main implements ActionListener, KeyListener{
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
         
+    }
+
+    static String retValue;
+
+    // public static String getUserInput(String prompt) throws InterruptedException{
+    //     retValue = "";
+
+
+    //     JFrame userInputFrame = new JFrame();
+    //     JPanel userInputPanel = new JPanel();
+
+    //     JTextField userInputField = new JTextField(prompt);
+    //     JButton submitButton = new JButton("Submit");
+
+    //     submitButton.addActionListener(new ActionListener(){
+
+    //         public void actionPerformed(ActionEvent e) {
+    //             retValue = userInputField.getText();
+    //             userInputFrame.dispose();
+    //         }
+    //     });
+
+    //     userInputPanel.setLayout(new GridLayout(2, 2));
+
+    //     userInputPanel.add(userInputField);
+    //     userInputPanel.add(submitButton);
+
+    //     userInputFrame.add(userInputPanel);
+
+    //     // userInputFrame.setUndecorated(true);
+    //     userInputFrame.setPreferredSize(new Dimension(300, 300));
+    //     userInputFrame.setResizable(false);
+    //     userInputFrame.pack();
+    //     userInputFrame.setVisible(true);
+
+    //     while(retValue == "") Thread.sleep(500);
+    //     return retValue;
+
+    // }
+
+    static void reset(){
+        userFrame.setVisible(false);
+        opponentFrame.setVisible(false);
     }
 
 
