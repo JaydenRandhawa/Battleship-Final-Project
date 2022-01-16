@@ -106,46 +106,74 @@ public class Game implements ActionListener, KeyListener{
         new Game(Color.BLACK, Color.WHITE);
     }
 
-    JMenuItem saveBoard, loadBoard, showEnemy, hideEnemy, printShips, restart;
+    JMenuItem saveBoard0, loadBoard0, showEnemy0, hideEnemy0, printShips0, restart0;
+    JMenuItem saveBoard1, loadBoard1, showEnemy1, hideEnemy1, printShips1, restart1;
 
-    public JMenuBar createMenuBar(){
+    public JMenuBar createMenuBar(int id){
         JMenuBar menuBar = new JMenuBar();
         JMenu game, debug;
-        restart = new JMenuItem("Restart");
-
 
         game = new JMenu("Game");
-        saveBoard = new JMenuItem("Make Preset From Layout");
-        loadBoard = new JMenuItem("Load Board Preset");
-        game.add(saveBoard);
-        game.add(loadBoard);
-
         debug = new JMenu("Debug");
-        showEnemy = new JMenuItem("Show Enemy Ships");
-        hideEnemy = new JMenuItem("Hide Enemy Ships");
-        printShips = new JMenuItem("Print Ships");
-        debug.add(showEnemy);
-        debug.add(hideEnemy);
-        debug.add(printShips);
 
-        saveBoard.addActionListener(menuClicks);
-        loadBoard.addActionListener(menuClicks);
-        showEnemy.addActionListener(menuClicks);
-        hideEnemy.addActionListener(menuClicks);
-        printShips.addActionListener(menuClicks);
-        restart.addActionListener(menuClicks);
+        if(id == 0){
+            saveBoard0 = new JMenuItem("Make Preset From Layout");
+            loadBoard0 = new JMenuItem("Load Board Preset");
+            restart0 = new JMenuItem("Restart");
+            game.add(saveBoard0);
+            game.add(loadBoard0);
+            game.add(restart0);
+    
+            showEnemy0 = new JMenuItem("Show Enemy Ships");
+            hideEnemy0 = new JMenuItem("Hide Enemy Ships");
+            printShips0 = new JMenuItem("Print Ships");
+            debug.add(showEnemy0);
+            debug.add(hideEnemy0);
+            debug.add(printShips0);
+    
+    
+            saveBoard0.addActionListener(menuClicks);
+            loadBoard0.addActionListener(menuClicks);
+            showEnemy0.addActionListener(menuClicks);
+            hideEnemy0.addActionListener(menuClicks);
+            printShips0.addActionListener(menuClicks);
+            restart0.addActionListener(menuClicks);
+        }
+
+        else if(id == 1){
+            saveBoard1 = new JMenuItem("Make Preset From Layout");
+            loadBoard1 = new JMenuItem("Load Board Preset");
+            restart1 = new JMenuItem("Restart");
+            game.add(saveBoard1);
+            game.add(loadBoard1);
+            game.add(restart1);
+    
+            showEnemy1 = new JMenuItem("Show Enemy Ships");
+            hideEnemy1 = new JMenuItem("Hide Enemy Ships");
+            printShips1 = new JMenuItem("Print Ships");
+            debug.add(showEnemy1);
+            debug.add(hideEnemy1);
+            debug.add(printShips1);
+    
+    
+            saveBoard1.addActionListener(menuClicks);
+            loadBoard1.addActionListener(menuClicks);
+            showEnemy1.addActionListener(menuClicks);
+            hideEnemy1.addActionListener(menuClicks);
+            printShips1.addActionListener(menuClicks);
+            restart1.addActionListener(menuClicks);
+        }
 
 
         menuBar.add(game);
         menuBar.add(debug);
-        menuBar.add(restart);
 
         return menuBar;
     }
 
     ActionListener menuClicks = new ActionListener(){
         public void actionPerformed(ActionEvent e) {
-            if(e.getSource() == saveBoard){
+            if(e.getSource() == saveBoard0){
 
                 JFrame userInputFrame = new JFrame();
                 JPanel userInputPanel = new JPanel();
@@ -166,7 +194,6 @@ public class Game implements ActionListener, KeyListener{
                                 userInstruction.setText("Board Preset With That Name Already Exists");
                             }
                         } catch (IOException e1) {
-                            // TODO Auto-generated catch block
                             e1.printStackTrace();
                         }
                         userInputFrame.dispose();
@@ -189,7 +216,7 @@ public class Game implements ActionListener, KeyListener{
 
             }
 
-            else if(e.getSource() == loadBoard){
+            else if(e.getSource() == loadBoard0 || e.getSource() == loadBoard1){
 
                 JFrame userInputFrame = new JFrame();
                 JPanel userInputPanel = new JPanel();
@@ -210,7 +237,6 @@ public class Game implements ActionListener, KeyListener{
                                 userInstruction.setText("There Is No Board Preset With That Name");
                             }
                         } catch (IOException e1) {
-                            // TODO Auto-generated catch block
                             e1.printStackTrace();
                         }
                         userInputFrame.dispose();
@@ -231,18 +257,25 @@ public class Game implements ActionListener, KeyListener{
                 userInputFrame.pack();
                 userInputFrame.setVisible(true);
             }
-            else if(e.getSource() == showEnemy){
+            else if(e.getSource() == restart0 || e.getSource() == restart1){
+                try {
+                    Battleship.restart();
+                } catch (IOException | InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            else if(e.getSource() == showEnemy0 || e.getSource() == showEnemy1){
                 DebugFunctions.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
             }
-            else if(e.getSource() == hideEnemy){
+            else if(e.getSource() == hideEnemy0 || e.getSource() == hideEnemy0){
                 DebugFunctions.hideEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, water);
                 
             }
-            else if(e.getSource() == printShips){
+            else if(e.getSource() == printShips0 || e.getSource() == printShips1){
                 DebugFunctions.printAllShips(carrier, battleship, submarine, destroyer);
                 
             }
-            else if(e.getSource() == restart){
+            else if(e.getSource() == restart0 || e.getSource() == restart1){
                 System.out.println("Restart");
             }
             
@@ -285,7 +318,7 @@ public class Game implements ActionListener, KeyListener{
         userFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         userFrame.setResizable(false);
         userFrame.add(userPane, BorderLayout.CENTER);
-        userFrame.setJMenuBar(createMenuBar());
+        userFrame.setJMenuBar(createMenuBar(0));
         userFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         userFrame.setTitle("Your Board");
         userFrame.pack();
@@ -313,7 +346,7 @@ public class Game implements ActionListener, KeyListener{
         opponentFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         opponentFrame.setResizable(false);
         opponentFrame.add(opponentPane, BorderLayout.CENTER);
-        // opponentFrame.setJMenuBar(createMenuBar());
+        opponentFrame.setJMenuBar(createMenuBar(1));
         opponentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         opponentFrame.setTitle("Opponent Board");
         opponentFrame.pack();
@@ -666,17 +699,14 @@ public class Game implements ActionListener, KeyListener{
     }
 
     public void keyPressed(KeyEvent e) {
-        // TODO Auto-generated method stub
         
     }
 
     public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
         
     }
 
     public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
         
     }
 
@@ -720,11 +750,11 @@ public class Game implements ActionListener, KeyListener{
 
         if(userPoints == 14){
             gameOver = true;
-            JOptionPane.showMessageDialog(null, "You Won");
+            JOptionPane.showMessageDialog(null, "<html>You Won!<br/>Go to Game > Restart in the menu bar to restart.</html>");
         }
         else if(cpuPoints == 14){
             gameOver = true;
-            JOptionPane.showMessageDialog(null, "You Lost");
+            JOptionPane.showMessageDialog(null, "<html>You Lost.<br/>Go to Game > Restart in the menu bar to restart.</html>");
         }
 
         return value;
