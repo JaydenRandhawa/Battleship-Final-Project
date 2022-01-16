@@ -106,8 +106,8 @@ public class Game implements ActionListener, KeyListener{
         new Game(Color.BLACK, Color.WHITE);
     }
 
-    JMenuItem saveBoard0, loadBoard0, showEnemy0, hideEnemy0, printShips0, restart0;
-    JMenuItem saveBoard1, loadBoard1, showEnemy1, hideEnemy1, printShips1, restart1;
+    JMenuItem saveBoard0, loadBoard0, saveQuit0, showEnemy0, hideEnemy0, printShips0, restart0;
+    JMenuItem saveBoard1, loadBoard1, saveQuit1, showEnemy1, hideEnemy1, printShips1, restart1;
 
     public JMenuBar createMenuBar(int id){
         JMenuBar menuBar = new JMenuBar();
@@ -119,9 +119,11 @@ public class Game implements ActionListener, KeyListener{
         if(id == 0){
             saveBoard0 = new JMenuItem("Make Preset From Layout");
             loadBoard0 = new JMenuItem("Load Board Preset");
+            saveQuit0 = new JMenuItem("Save Game State and Quit");
             restart0 = new JMenuItem("Restart");
             game.add(saveBoard0);
             game.add(loadBoard0);
+            game.add(saveQuit0);
             game.add(restart0);
     
             showEnemy0 = new JMenuItem("Show Enemy Ships");
@@ -134,6 +136,7 @@ public class Game implements ActionListener, KeyListener{
     
             saveBoard0.addActionListener(menuClicks);
             loadBoard0.addActionListener(menuClicks);
+            // saveQuit0.addActionListener(menuClicks);
             showEnemy0.addActionListener(menuClicks);
             hideEnemy0.addActionListener(menuClicks);
             printShips0.addActionListener(menuClicks);
@@ -143,9 +146,11 @@ public class Game implements ActionListener, KeyListener{
         else if(id == 1){
             saveBoard1 = new JMenuItem("Make Preset From Layout");
             loadBoard1 = new JMenuItem("Load Board Preset");
+            saveQuit1 = new JMenuItem("Save Game State and Quit");
             restart1 = new JMenuItem("Restart");
             game.add(saveBoard1);
             game.add(loadBoard1);
+            game.add(saveQuit1);
             game.add(restart1);
     
             showEnemy1 = new JMenuItem("Show Enemy Ships");
@@ -158,6 +163,7 @@ public class Game implements ActionListener, KeyListener{
     
             saveBoard1.addActionListener(menuClicks);
             loadBoard1.addActionListener(menuClicks);
+            // saveQuit1.addActionListener(menuClicks);
             showEnemy1.addActionListener(menuClicks);
             hideEnemy1.addActionListener(menuClicks);
             printShips1.addActionListener(menuClicks);
@@ -257,6 +263,9 @@ public class Game implements ActionListener, KeyListener{
                 userInputFrame.pack();
                 userInputFrame.setVisible(true);
             }
+            // else if(e.getSource() == saveQuit0 || e.getSource() == saveQuit1){
+            //     saveQuit();
+            // }
             else if(e.getSource() == restart0 || e.getSource() == restart1){
                 try {
                     Battleship.restart();
