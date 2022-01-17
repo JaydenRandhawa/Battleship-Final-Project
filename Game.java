@@ -96,13 +96,14 @@ public class Game implements ActionListener, KeyListener{
 
     Random randPos = new Random();
     static Random randFile = new Random();
-    // static File enemyBoard = new File("OpponentPresets/6.txt");
 
 
     public static void start() throws IOException, InterruptedException {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         createEnemyShips();
         boatsPlaced = false;
+        File hsFile = new File("Highscore.txt");
+        hsFile.createNewFile();
         new Game(Color.BLACK, Color.WHITE);
     }
 
@@ -123,7 +124,7 @@ public class Game implements ActionListener, KeyListener{
             restart0 = new JMenuItem("Restart");
             game.add(saveBoard0);
             game.add(loadBoard0);
-            game.add(saveQuit0);
+            // game.add(saveQuit0);
             game.add(restart0);
     
             showEnemy0 = new JMenuItem("Show Enemy Ships");
@@ -136,7 +137,7 @@ public class Game implements ActionListener, KeyListener{
     
             saveBoard0.addActionListener(menuClicks);
             loadBoard0.addActionListener(menuClicks);
-            // saveQuit0.addActionListener(menuClicks);
+            saveQuit0.addActionListener(menuClicks);
             showEnemy0.addActionListener(menuClicks);
             hideEnemy0.addActionListener(menuClicks);
             printShips0.addActionListener(menuClicks);
@@ -150,7 +151,7 @@ public class Game implements ActionListener, KeyListener{
             restart1 = new JMenuItem("Restart");
             game.add(saveBoard1);
             game.add(loadBoard1);
-            game.add(saveQuit1);
+            // game.add(saveQuit1);
             game.add(restart1);
     
             showEnemy1 = new JMenuItem("Show Enemy Ships");
@@ -163,7 +164,7 @@ public class Game implements ActionListener, KeyListener{
     
             saveBoard1.addActionListener(menuClicks);
             loadBoard1.addActionListener(menuClicks);
-            // saveQuit1.addActionListener(menuClicks);
+            saveQuit1.addActionListener(menuClicks);
             showEnemy1.addActionListener(menuClicks);
             hideEnemy1.addActionListener(menuClicks);
             printShips1.addActionListener(menuClicks);
@@ -292,13 +293,14 @@ public class Game implements ActionListener, KeyListener{
     };
 
     public static void createEnemyShips() throws IOException{
-        enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
+        // enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
+        enemyBoard = new File("OpponentPresets/1.txt");
         System.out.println(enemyBoard);
         inp = new Scanner(enemyBoard);
     }
 
 
-    public Game(Color borderColour, Color squareColour) {
+    public Game(Color borderColour, Color squareColour) throws IOException {
 
         // SECTION User panel, footer, frame initialization.
         JPanel userPanel = new JPanel();
@@ -669,28 +671,32 @@ public class Game implements ActionListener, KeyListener{
                 }
             }
             else if(boardID == 1){
-                if(!handleHit(coords, 0)){
-                    System.out.println("Miss");
-                    String hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
-                    int[] hitCoords= new int[2];
-    
-                    hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
-                    hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
-    
-                    remainingEnemySquares.remove(hitPos);
-    
-                    while(handleHit(hitCoords, 1) && !gameOver){
-                        hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
-    
+                try {
+                    if(!handleHit(coords, 0)){
+                        System.out.println("Miss");
+                        String hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
+                        int[] hitCoords= new int[2];
+   
                         hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
                         hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
-    
+   
                         remainingEnemySquares.remove(hitPos);
+   
+                        while(handleHit(hitCoords, 1) && !gameOver){
+                            hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
+   
+                            hitCoords[0] = Integer.parseInt(hitPos.split(", ")[0]);
+                            hitCoords[1] = Integer.parseInt(hitPos.split(", ")[1]);
+   
+                            remainingEnemySquares.remove(hitPos);
+                        }
+   
                     }
-    
-                }
-                else{
-                    System.out.println("Hit");
+                    else{
+                        System.out.println("Hit");
+                    }
+                } catch (NumberFormatException | IOException e1) {
+                    e1.printStackTrace();
                 }
             }
         }
@@ -725,19 +731,43 @@ public class Game implements ActionListener, KeyListener{
     }
 
 
+    int highScore(boolean setHighscore) throws IOException{
+        File hsFile = new File("Highscore.txt");
+        Scanner inp = new Scanner(hsFile);
+
+        if(setHighscore){
+            try(FileWriter hsWrite = new FileWriter("Highscore.txt", false)){
+                if(!inp.hasNextInt() || inp.nextInt() > moveCount){
+                    hsWrite.write(String.valueOf(moveCount));
+                    return 1;
+                }
+                return 0;
+            }
+        }
+        else{
+            if(inp.hasNextInt()){
+                return inp.nextInt();
+            }
+            return 64;
+        }
+    }
+
+    int moveCount = 0;
+
     int userPoints = 0;
     int cpuPoints = 0;
 
-    public boolean handleHit(int[] coords, int boardID){
+    public boolean handleHit(int[] coords, int boardID) throws IOException{
         boolean value = false;
 
         if(boardID == 0){
-            opponentInstruction.setText("Miss at: " + coords[0] + ", " + coords[1]);
+            moveCount ++;
+            opponentInstruction.setText("<html>Miss at: " + coords[0] + ", " + coords[1] + "<br/> Hits/Misses: " + userPoints + "/" + (moveCount - userPoints) + "\tHigh Score: " + highScore(false) + "</html>");
             cpuButtons[coords[0]][coords[1]].setIcon(hitWater);
             while(unhitEnemyShips.contains(coords[0] + "," + coords[1])){
                 userPoints ++;
                 unhitEnemyShips.remove(unhitEnemyShips.indexOf(coords[0] + "," + coords[1]));
-                opponentInstruction.setText("Hit at: " + coords[0] + ", " + coords[1]);
+                opponentInstruction.setText("<html>Hit at: " + coords[0] + ", " + coords[1] + "<br/> Hits/Misses: " + userPoints + "/" + (moveCount - userPoints) + "\tHigh Score: " + highScore(false) + "</html>");
                 cpuButtons[coords[0]][coords[1]].setIcon(hitShip);
                 value = true;
             }
@@ -759,7 +789,8 @@ public class Game implements ActionListener, KeyListener{
 
         if(userPoints == 14){
             gameOver = true;
-            JOptionPane.showMessageDialog(null, "<html>You Won!<br/>Go to Game > Restart in the menu bar to restart.</html>");
+            System.out.println(highScore(true));
+            JOptionPane.showMessageDialog(null, "<html>You Won!<br/> High Score: " + highScore(false) + "\tYour Score: " + moveCount + "<br/>Go to Game > Restart in the menu bar to restart.</html>");
         }
         else if(cpuPoints == 14){
             gameOver = true;
