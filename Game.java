@@ -38,33 +38,41 @@ import java.util.Random;
 
 public class Game implements ActionListener, KeyListener{
 
-    ImageIcon water = new ImageIcon("Assets/Water.png");
-    ImageIcon hitWater = new ImageIcon("Assets/HitWater.png");
-    static ImageIcon ship = new ImageIcon("Assets/Ship.png");
-    ImageIcon hitShip = new ImageIcon("Assets/HitShip.png");
+    // SECTION Create global objects
 
+    // ANCHOR Create ImageIcon objects for the images used on the game board.
+    static ImageIcon water = new ImageIcon("Assets/Water.png");
+    static ImageIcon hitWater = new ImageIcon("Assets/HitWater.png");
+    static ImageIcon ship = new ImageIcon("Assets/Ship.png");
+    static ImageIcon hitShip = new ImageIcon("Assets/HitShip.png");
+
+    // ANCHOR Store the width and heght of the gameboards
     static int width = 8;
     static int height = 8;
 
+    // ANCHOR Create 2D arrays to store the buttons used to make the user and opponent grids
     static JButton[][] userButtons = new JButton[width][height];
-    JButton[][] cpuButtons = new JButton[width][height];
+    static JButton[][] cpuButtons = new JButton[width][height];
 
+    // ANCHOR Create the JFrame objects to diplay the two game boards
     static JFrame userFrame;
     static JFrame opponentFrame;
 
+    // ANCHOR Create the JLabel objects that display instructions for the user
     JLabel userInstruction;
     JLabel opponentInstruction;
-    
-    int[] prevSquare = new int[2];
 
+    // ANCHOR Create arrays to hold the positions of each user ship
     static int[][] carrier = new int[2][5];
     static int[][] battleship = new int[2][4];
     static int[][] submarine = new int[2][3];
     static int[][] destroyer = new int[2][2];
-
+    
+    // ANCHOR Creatae ArrayLists that store the unhit squares on the baord that have ships
     static ArrayList<String> unhitUserShips = new ArrayList<String>();
     static ArrayList<String> unhitEnemyShips = new ArrayList<String>();
 
+    // ANCHOR Store the sqaures on the users board that have not been hit
     ArrayList<String> remainingEnemySquares = new ArrayList<String>(Arrays.asList(
     "0, 0", "0, 1", "0, 2", "0, 3", "0, 4", "0, 5", "0, 6", "0, 7", 
     "1, 0", "1, 1", "1, 2", "1, 3", "1, 4", "1, 5", "1, 6", "1, 7", 
@@ -75,29 +83,41 @@ public class Game implements ActionListener, KeyListener{
     "6, 0", "6, 1", "6, 2", "6, 3", "6, 4", "6, 5", "6, 6", "6, 7", 
     "7, 0", "7, 1", "7, 2", "7, 3", "7, 4", "7, 5", "7, 6", "7, 7"));
 
+    // ANCHOR define the path to the enemy board, create a scanner object, and initialize the enemy ship locations using the opponent board preset file
     static File enemyBoard;
     static Scanner inp;
 
-    
     String[][] enemyCarrier = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
     String[][] enemyBattleship = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
     String[][] enemySubmarine = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
     String[][] enemyDestroyer = {inp.nextLine().split(", "), inp.nextLine().split(", ")};
 
+    // ANCHOR store the length and orientation of the ship that will be placed next
     int currentLength = 5;
     boolean isVertical = true;
 
+    // ANCHOR Create a boolean to store whether or not all user ships have been placed
     static boolean boatsPlaced;
 
+    //ANCHOR Store the state of the game
     boolean gameOver = false;
 
-    int[][] tempPlacement = new int[2][5];
-
-
-    Random randPos = new Random();
+    // ANCHOR Create random objects to choose a random position and board preset file
+    static Random randPos = new Random();
     static Random randFile = new Random();
 
+    // !SECTION
 
+    // SECTION Pregame Methods
+
+
+    /**
+     * ANCHOR Entry method, sets up the game
+     * No pre-conditions
+     * @throws IOException
+     * @throws InterruptedException
+     * Sets menu bar setting to native, creates enemy ships, sets boatsPlaced to false, creates a highscore file if it doesnt exist, calls the main game method
+     */
     public static void start() throws IOException, InterruptedException {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         createEnemyShips();
@@ -107,17 +127,27 @@ public class Game implements ActionListener, KeyListener{
         new Game(Color.BLACK, Color.WHITE);
     }
 
+    // ANCHOR create the menu bar item objects
     JMenuItem saveBoard0, loadBoard0, saveQuit0, showEnemy0, hideEnemy0, printShips0, restart0;
     JMenuItem saveBoard1, loadBoard1, saveQuit1, showEnemy1, hideEnemy1, printShips1, restart1;
 
+    /**
+     * ANCHOR Create the menu bar
+     * @param id, indicates which JFrame the menu bar will be a member of
+     * @return a menu bar object with the desired itms and functions
+     */
     public JMenuBar createMenuBar(int id){
+        // ANCHOR Create a JMenuBar object and two Menu objects
         JMenuBar menuBar = new JMenuBar();
         JMenu game, debug;
 
+        // ANCHOR Initialize the two menu objects
         game = new JMenu("Game");
         debug = new JMenu("Debug");
 
+        // ANCHOR If statement to diffferentiate between the user JFrame and the opponent JFrame
         if(id == 0){
+            // ANCHOR Initialize the game menu JMenuItem objects and add them to the menu
             saveBoard0 = new JMenuItem("Make Preset From Layout");
             loadBoard0 = new JMenuItem("Load Board Preset");
             saveQuit0 = new JMenuItem("Save Game State and Quit");
@@ -127,6 +157,7 @@ public class Game implements ActionListener, KeyListener{
             // game.add(saveQuit0);
             game.add(restart0);
     
+            // ANCHOR Initialize the debug menu JMenuItem objects and add them to the menu
             showEnemy0 = new JMenuItem("Show Enemy Ships");
             hideEnemy0 = new JMenuItem("Hide Enemy Ships");
             printShips0 = new JMenuItem("Print Ships");
@@ -134,7 +165,7 @@ public class Game implements ActionListener, KeyListener{
             debug.add(hideEnemy0);
             debug.add(printShips0);
     
-    
+            // ANCHOR Add action listeners to each JMenuItem object
             saveBoard0.addActionListener(menuClicks);
             loadBoard0.addActionListener(menuClicks);
             saveQuit0.addActionListener(menuClicks);
@@ -175,6 +206,7 @@ public class Game implements ActionListener, KeyListener{
         menuBar.add(game);
         menuBar.add(debug);
 
+        // ANCHOR Return the JMenuBar object
         return menuBar;
     }
 
@@ -299,16 +331,16 @@ public class Game implements ActionListener, KeyListener{
         inp = new Scanner(enemyBoard);
     }
 
+            // !SECTION
 
     public Game(Color borderColour, Color squareColour) throws IOException {
 
-        // SECTION User panel, footer, frame initialization.
+        // ANCHOR User panel, footer, frame initialization.
         JPanel userPanel = new JPanel();
         JPanel userFooter = new JPanel();
         userFrame = new JFrame();
-        // !SECTION
 
-        // SECTION User panel, footer, frame setup
+        // ANCHOR User panel, footer, frame setup
         userPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         userPanel.setLayout(new GridLayout(height, width));
         // userPanel.setBackground(Color.DARK_GRAY);
@@ -364,7 +396,6 @@ public class Game implements ActionListener, KeyListener{
         opponentFrame.setLocation(800, 0);
 
 
-        // SECTION userGrid buttons creation
         for(int i=0;i<height;i++){
             for(int ii=0;ii<width;ii++){
                 JButton x =  userButtons[ii][i] = new JButton("" + ii + "," + i + "," + 0);
@@ -382,7 +413,6 @@ public class Game implements ActionListener, KeyListener{
                 userPanel.add(x);
             }
         }
-        // !SECTION
 
 
         for(int i=0;i<height;i++){
