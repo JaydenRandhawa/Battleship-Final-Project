@@ -1,3 +1,9 @@
+/**
+ * @author Jayden Randhawa
+ * 17/12/2022
+ * A gamed based on the board game battleship.
+ */
+
 import Dependancies.DebugFunctions;
 
 import java.awt.Color;
@@ -210,9 +216,11 @@ public class Game implements ActionListener, KeyListener{
         return menuBar;
     }
 
+    // ANCHOR Listen for menu bar clicks
     ActionListener menuClicks = new ActionListener(){
         public void actionPerformed(ActionEvent e) {
-            if(e.getSource() == saveBoard0){
+            // ANCHOR if the save board button was clicked, open a prompt to get the name of the save and then create a save file with that name
+            if(e.getSource() == saveBoard0 || e.getSource() == saveBoard1){
 
                 JFrame userInputFrame = new JFrame();
                 JPanel userInputPanel = new JPanel();
@@ -254,7 +262,8 @@ public class Game implements ActionListener, KeyListener{
                 userInputFrame.setVisible(true);
 
             }
-
+    
+            //ANCHOR if the load bord button was clicked, open a prompt to get the name of a save file then load the ships from that file
             else if(e.getSource() == loadBoard0 || e.getSource() == loadBoard1){
 
                 JFrame userInputFrame = new JFrame();
@@ -299,6 +308,8 @@ public class Game implements ActionListener, KeyListener{
             // else if(e.getSource() == saveQuit0 || e.getSource() == saveQuit1){
             //     saveQuit();
             // }
+
+            // ANCHOR if the restart button was clicked, call the restart method of the Battleship class
             else if(e.getSource() == restart0 || e.getSource() == restart1){
                 try {
                     Battleship.restart();
@@ -306,6 +317,9 @@ public class Game implements ActionListener, KeyListener{
                     e1.printStackTrace();
                 }
             }
+
+            // ANCHOR if a debug button is pressed, call the respective debug method of the Debug class
+            
             else if(e.getSource() == showEnemy0 || e.getSource() == showEnemy1){
                 DebugFunctions.showEnemyShips(cpuButtons, enemyCarrier, enemyBattleship, enemySubmarine, enemyDestroyer, ship);
             }
@@ -317,22 +331,32 @@ public class Game implements ActionListener, KeyListener{
                 DebugFunctions.printAllShips(carrier, battleship, submarine, destroyer);
                 
             }
-            else if(e.getSource() == restart0 || e.getSource() == restart1){
-                System.out.println("Restart");
-            }
             
         }
     };
 
+    /**
+     * ANCHOR Chooses a random opponent preset file and loads the ships from it
+     * No pre-conditions
+     * prints the file object to the console
+     * @throws IOException
+     */
     public static void createEnemyShips() throws IOException{
-        // enemyBoard = new File("OpponentPresets/" + randFile.nextInt(6) + ".txt");
-        enemyBoard = new File("OpponentPresets/1.txt");
+        enemyBoard = new File("OpponentPresets/" + randFile.nextInt(11) + ".txt");
+        // enemyBoard = new File("OpponentPresets/1.txt");
         System.out.println(enemyBoard);
         inp = new Scanner(enemyBoard);
     }
 
             // !SECTION
 
+    /**
+     * ANCHOR Draws the two boards.
+     * @param borderColour the colour of hte grid lines, a Color object
+     * @param squareColour the colour of the squares in the grid, a Color object
+     * @throws IOException
+     * Creates two JFrame objects
+     */
     public Game(Color borderColour, Color squareColour) throws IOException {
 
         // ANCHOR User panel, footer, frame initialization.
@@ -358,6 +382,7 @@ public class Game implements ActionListener, KeyListener{
         userPane.setDividerLocation(height*100);
         userPane.setDividerSize(0);
 
+        // ANCHOR configure the JFrame options and add the JPane
         userFrame.setPreferredSize(new Dimension(width*100, (height+1)*100));
         userFrame.setResizable(false);
         userFrame.add(userPane, BorderLayout.CENTER);
@@ -365,9 +390,6 @@ public class Game implements ActionListener, KeyListener{
         userFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         userFrame.setTitle("Your Board");
         userFrame.pack();
-        // !SECTION
-
-
 
         opponentFrame = new JFrame();
         JPanel opponentPanel = new JPanel();
@@ -395,6 +417,8 @@ public class Game implements ActionListener, KeyListener{
         opponentFrame.pack();
         opponentFrame.setLocation(800, 0);
 
+
+        // ANCHOR Create the button objects for the game baords and populate the userButton and cpuButton arrays
 
         for(int i=0;i<height;i++){
             for(int ii=0;ii<width;ii++){
@@ -433,6 +457,7 @@ public class Game implements ActionListener, KeyListener{
             }
         }
 
+        // ANCHOR  initialize the user footer JLabel and set the initial text
         userInstruction = new JLabel();
         userInstruction.setHorizontalAlignment(SwingConstants.CENTER);
         userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
@@ -449,6 +474,11 @@ public class Game implements ActionListener, KeyListener{
 
     }
 
+    /**
+     * ANCHOR Add the user ships to the list of unhit user and enemy ships
+     * No preconditions
+     * Adds items to the unhit ships array lists
+     */
     public void createPlayerLists(){
         for(int i=0;i<5;i++){
             unhitUserShips.add(carrier[0][i] + "," + carrier[1][i]);
@@ -471,6 +501,16 @@ public class Game implements ActionListener, KeyListener{
         }
     }
 
+    /**
+     * ANCHOR mathod that saves the user ship arrays to a file to be recalled
+     * @param fileName the name of the file to be created and written to
+     * @param carrier
+     * @param battleship
+     * @param submarine
+     * @param destroyer
+     * @return true if the file was created succesfully, false if it was not
+     * @throws IOException
+     */
     public static boolean saveUserBoard(String fileName, int[][] carrier, int[][] battleship, int[][] submarine, int[][] destroyer) throws IOException{
         File saveFile = new File("UserPresets/" + fileName + ".txt");
 
@@ -524,6 +564,12 @@ public class Game implements ActionListener, KeyListener{
         return false;
     }
 
+    /**
+     * ANCHOR load ships from a preset file
+     * @param fileName the name of the file to be read from
+     * @return true if the file exists, false if it doesnt
+     * @throws FileNotFoundException
+     */
     public boolean loadPresetLayout(String fileName) throws FileNotFoundException{
         File saveFile = new File("UserPresets/" + fileName + ".txt");
 
@@ -585,13 +631,19 @@ public class Game implements ActionListener, KeyListener{
         return false;
     }
 
+    // SECTION Board Clicks
+
+    // ANCHOR create an action listener to handle board clicks
     ActionListener boardClicks = new ActionListener(){
         public void actionPerformed(ActionEvent e) {
+            // ANCHOR seperate the id of the board and the coordinates of the click
             String[] fields = e.getActionCommand().split(",");
             int boardID = Integer.parseInt(fields[2]);
             int coords[] = new int[]{Integer.parseInt(fields[0]), Integer.parseInt(fields[1])};
     
+            // ANCHOR if the click came from the user board
             if(boardID == 0){
+                // ANCHOR if not all boats have been placed
                 if(!boatsPlaced){
                     if(isVertical){
                         if(coords[1] + currentLength - 1 < width ){
@@ -626,12 +678,14 @@ public class Game implements ActionListener, KeyListener{
                                     break;
                             }
     
+                            // ANCHOR if there is still another ship to place, set its length and set the instruction panel
                             if(currentLength > 2){
                                 currentLength -= 1;
                                 userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
                                 if(isVertical) userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is vertical(press r to change)</html>");
                                 else userInstruction.setText(userInstruction.getText() + "<br/> Current orientation is horizontal(press r to change)</html>");
                             }
+                            // ANCHOR if there are no other ships, show the enemy board and create the player lists
                             else{
                                 boatsPlaced = true;
                                 userInstruction.setText("All ships placed.");
@@ -700,8 +754,11 @@ public class Game implements ActionListener, KeyListener{
                     }
                 }
             }
+
+            // ANCHOR if the click came from the enemy board
             else if(boardID == 1){
                 try {
+                    // ANCHOR if the click was a miss, execute an opponent turn
                     if(!handleHit(coords, 0)){
                         System.out.println("Miss");
                         String hitPos = remainingEnemySquares.get(randPos.nextInt(remainingEnemySquares.size()));
@@ -722,6 +779,7 @@ public class Game implements ActionListener, KeyListener{
                         }
    
                     }
+                    // if the click was a hit, wait for the next click
                     else{
                         System.out.println("Hit");
                     }
@@ -734,6 +792,7 @@ public class Game implements ActionListener, KeyListener{
     };
 
     public void keyTyped(KeyEvent e) {
+        // ANCHOR if the user pressed the r key, change the orientation if the next ship
         if(e.getKeyChar() == 'r' || e.getKeyChar() == 'R'){
             isVertical = !isVertical;
             userInstruction.setText("<html>Select placement for your ship with length : " + currentLength);
@@ -755,12 +814,19 @@ public class Game implements ActionListener, KeyListener{
         
     }
 
+    // ANCHOR hide the game board during reset
     static void reset(){
         userFrame.setVisible(false);
         opponentFrame.setVisible(false);
     }
 
 
+    /**
+     * ANCHOR Set or query the high score
+     * @param setHighscore if true change the value of the high score, if false return the value of the high score
+     * @return 0 or 1 if setHighScore is true or the current high score if setHighScore is false
+     * @throws IOException
+     */
     int highScore(boolean setHighscore) throws IOException{
         File hsFile = new File("Highscore.txt");
         Scanner inp = new Scanner(hsFile);
@@ -787,6 +853,13 @@ public class Game implements ActionListener, KeyListener{
     int userPoints = 0;
     int cpuPoints = 0;
 
+    /**
+     * ANCHOR Handle user and enemy hits
+     * @param coords the coordinates of the hit
+     * @param boardID the board on which the hit came from
+     * @return true if the click was a hit or fals eif it was a miss
+     * @throws IOException
+     */
     public boolean handleHit(int[] coords, int boardID) throws IOException{
         boolean value = false;
 
@@ -794,6 +867,7 @@ public class Game implements ActionListener, KeyListener{
             moveCount ++;
             opponentInstruction.setText("<html>Miss at: " + coords[0] + ", " + coords[1] + "<br/> Hits/Misses: " + userPoints + "/" + (moveCount - userPoints) + "\tHigh Score: " + highScore(false) + "</html>");
             cpuButtons[coords[0]][coords[1]].setIcon(hitWater);
+            // ANCHOR remove all occurences of the coordinate that was hit
             while(unhitEnemyShips.contains(coords[0] + "," + coords[1])){
                 userPoints ++;
                 unhitEnemyShips.remove(unhitEnemyShips.indexOf(coords[0] + "," + coords[1]));
@@ -817,6 +891,7 @@ public class Game implements ActionListener, KeyListener{
 
         System.out.println("User Points: " + userPoints + "\nComputer Points: " + cpuPoints);
 
+        // if the user won show a win screen, if the computer won show a lose screen
         if(userPoints == 14){
             gameOver = true;
             System.out.println(highScore(true));
