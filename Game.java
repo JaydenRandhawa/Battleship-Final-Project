@@ -5,6 +5,7 @@
  */
 
 import Dependancies.DebugFunctions;
+import Dependancies.Rules;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -134,8 +135,8 @@ public class Game implements ActionListener, KeyListener{
     }
 
     // ANCHOR create the menu bar item objects
-    JMenuItem saveBoard0, loadBoard0, saveQuit0, showEnemy0, hideEnemy0, printShips0, restart0;
-    JMenuItem saveBoard1, loadBoard1, saveQuit1, showEnemy1, hideEnemy1, printShips1, restart1;
+    JMenuItem rules0, saveBoard0, loadBoard0, saveQuit0, showEnemy0, hideEnemy0, printShips0, restart0;
+    JMenuItem rules1, saveBoard1, loadBoard1, saveQuit1, showEnemy1, hideEnemy1, printShips1, restart1;
 
     /**
      * ANCHOR Create the menu bar
@@ -154,10 +155,12 @@ public class Game implements ActionListener, KeyListener{
         // ANCHOR If statement to diffferentiate between the user JFrame and the opponent JFrame
         if(id == 0){
             // ANCHOR Initialize the game menu JMenuItem objects and add them to the menu
+            rules0 = new JMenuItem("Rules");
             saveBoard0 = new JMenuItem("Make Preset From Layout");
             loadBoard0 = new JMenuItem("Load Board Preset");
             saveQuit0 = new JMenuItem("Save Game State and Quit");
             restart0 = new JMenuItem("Restart");
+            game.add(rules0);
             game.add(saveBoard0);
             game.add(loadBoard0);
             // game.add(saveQuit0);
@@ -172,6 +175,7 @@ public class Game implements ActionListener, KeyListener{
             debug.add(printShips0);
     
             // ANCHOR Add action listeners to each JMenuItem object
+            rules0.addActionListener(menuClicks);
             saveBoard0.addActionListener(menuClicks);
             loadBoard0.addActionListener(menuClicks);
             saveQuit0.addActionListener(menuClicks);
@@ -182,10 +186,12 @@ public class Game implements ActionListener, KeyListener{
         }
 
         else if(id == 1){
+            rules1 = new JMenuItem("Rules");
             saveBoard1 = new JMenuItem("Make Preset From Layout");
             loadBoard1 = new JMenuItem("Load Board Preset");
             saveQuit1 = new JMenuItem("Save Game State and Quit");
             restart1 = new JMenuItem("Restart");
+            game.add(rules1);
             game.add(saveBoard1);
             game.add(loadBoard1);
             // game.add(saveQuit1);
@@ -198,7 +204,7 @@ public class Game implements ActionListener, KeyListener{
             debug.add(hideEnemy1);
             debug.add(printShips1);
     
-    
+            rules1.addActionListener(menuClicks);
             saveBoard1.addActionListener(menuClicks);
             loadBoard1.addActionListener(menuClicks);
             saveQuit1.addActionListener(menuClicks);
@@ -219,8 +225,12 @@ public class Game implements ActionListener, KeyListener{
     // ANCHOR Listen for menu bar clicks
     ActionListener menuClicks = new ActionListener(){
         public void actionPerformed(ActionEvent e) {
+            // ANCHOR if the restart button was clicked, open the how to play screen
+            if(e.getSource() == rules0 || e.getSource() == rules1){
+                Rules.displayRules();
+            }
             // ANCHOR if the save board button was clicked, open a prompt to get the name of the save and then create a save file with that name
-            if(e.getSource() == saveBoard0 || e.getSource() == saveBoard1){
+            else if(e.getSource() == saveBoard0 || e.getSource() == saveBoard1){
 
                 JFrame userInputFrame = new JFrame();
                 JPanel userInputPanel = new JPanel();

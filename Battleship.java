@@ -1,8 +1,11 @@
+import Dependancies.Rules;
+
 import java.io.IOException;
 
 public class Battleship {
     // ANCHOR start the game by running the start method of the game class
     public static void main(String[] args) throws IOException, InterruptedException {
+        Rules.displayRules();
         Game.start();
     };
 
