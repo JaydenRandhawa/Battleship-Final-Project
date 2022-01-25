@@ -194,6 +194,7 @@ public class Game implements ActionListener, KeyListener{
             game.add(rules1);
             game.add(saveBoard1);
             game.add(loadBoard1);
+            
             // game.add(saveQuit1);
             game.add(restart1);
     
